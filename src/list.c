@@ -4,6 +4,8 @@
 #include "list-private.h"
 #include "string.h"
 #include "stdlib.h"
+#include "stdio.h"
+
 
 /* Função que cria e inicializa uma nova lista (estrutura list_t a
  * ser definida pelo grupo no ficheiro list-private.h).
@@ -77,6 +79,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     {
         list->head = newNode;
         list->size++;
+        printf("Entrou na cabeca no ADD   ");
         return 0;
     }
 
@@ -103,13 +106,15 @@ int list_add(struct list_t *list, struct entry_t *entry)
                 previous->next = newNode; // colocar no nó anterior a informação deste no
 
             newNode->next = current; // Colocar no novo nó a informação de quem é o proximo nó
-            list->size++;            // Aumentar o tamanho da lista
+            list->size++; 
+            printf("PPFFF PASSA AQUI");           // Aumentar o tamanho da lista
             return 0;
         }
         else // Continuar a procura
         {
             previous = current; // Alterar as variavel de ajuda
             current = current->next;
+            printf((current==NULL)?"FOI ISTO":"NAO");
         }
     }
 }
@@ -120,15 +125,15 @@ int list_add(struct list_t *list, struct entry_t *entry)
  * ou -1 em caso de erro.
  */
 int list_remove(struct list_t *list, char *key){
-    if(list == NULL || key == NULL){
+    if(list == NULL || key == NULL || list->head == NULL){
         return -1;
     }
     struct node_t *current = list->head;
-
+    //printf((current->next == NULL)?"   ERRADO na class list":"OK");
     // Se a key for a head da list
     if(strcmp(key, current->entry->key) == 0){
-        entry_destroy(current->entry);
         list->head = current->next;
+        entry_destroy(current->entry);
         free(current);
         list->size--;
         return 0;
@@ -153,17 +158,34 @@ int list_remove(struct list_t *list, char *key){
  * Retorna a referência da entry na lista ou NULL se não encontrar a
  * entry ou em caso de erro.
  */
-struct entry_t *list_get(struct list_t *list, char *key)
-{
+struct entry_t *list_get(struct list_t *list, char *key){
+    if(list == NULL || key == NULL || list->head == NULL){
+       // printf("Entrou no NULL");
+        return NULL;
+    }
+
+    struct node_t *current = list->head;
+    while (current != NULL){
+       // printf("1 vez");
+        if(strcmp(key, current->entry->key) == 0){
+            return current->entry;
+        }
+        current = current->next;
+    }
+
+    // Caso não exista    
+   // printf("nao existe");
     return NULL;
 }
 
 /* Função que conta o número de entries na lista passada como argumento.
  * Retorna o tamanho da lista ou -1 em caso de erro.
  */
-int list_size(struct list_t *list)
-{
-    return NULL;
+int list_size(struct list_t *list){
+    if(list == NULL){
+        return -1;
+    }
+    return list->size;
 }
 
 /* Função que constrói um array de char* com a cópia de todas as keys na
@@ -171,8 +193,7 @@ int list_size(struct list_t *list)
  * reservando toda a memória necessária.
  * Retorna o array de strings ou NULL em caso de erro.
  */
-char **list_get_keys(struct list_t *list)
-{
+char **list_get_keys(struct list_t *list){
     return NULL;
 }
 
