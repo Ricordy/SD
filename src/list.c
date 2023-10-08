@@ -68,7 +68,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     if (newNode == NULL)
         return -1;
 
-    // Passar a informação para 
+    // Passar a informação para
     newNode->entry = entry;
     newNode->next = NULL;
 
@@ -78,6 +78,39 @@ int list_add(struct list_t *list, struct entry_t *entry)
         list->head = newNode;
         list->size++;
         return 0;
+    }
+
+    // Verificar os nós da lista para colocar o novo nó
+    struct node_t *current = list->head;
+    struct node_t *previous = NULL;
+
+    // Correr a lista até ao fim ou encontrar a posição
+    while (current != NULL)
+    {
+        int cmp = entry_compare(entry, current->entry);
+        if (cmp == 0) // Se o resultado é zero, as keys são iguais e deve-se substituir pela nova entry
+        {
+            entry_destroy(current->entry); // Destruir a entrada já existente
+            current->entry = entry;        // Colocar a nova entry no lugar da entrada antiga
+            free(newNode);                 // Libertar o espaço utilizado pelo novo nó.
+            return 0;
+        }
+        else if (cmp == -1) // Entry1 é menor
+        {
+            if (previous == NULL)         // Se ainda não foi encontrado um nó menor
+                list->head = newNode;     // Colocar o novo nó na head
+            else                          // Existind um nó maior
+                previous->next = newNode; // colocar no nó anterior a informação deste no
+
+            newNode->next = current; // Colocar no novo nó a informação de quem é o proximo nó
+            list->size++;            // Aumentar o tamanho da lista
+            return 0;
+        }
+        else // Continuar a procura
+        {
+            previous = current; // Alterar as variavel de ajuda
+            current = current->next;
+        }
     }
 }
 
