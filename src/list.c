@@ -93,7 +93,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
             entry_destroy(current->entry); // Destruir a entrada já existente
             current->entry = entry;        // Colocar a nova entry no lugar da entrada antiga
             free(newNode);                 // Libertar o espaço utilizado pelo novo nó.
-            return 0;
+            return 1;
         }
         else if (cmp == -1) // Entry1 é menor
         {
@@ -124,7 +124,7 @@ int list_remove(struct list_t *list, char *key){
         return -1;
     }
     struct node_t *current = list->head;
-    
+
     // Se a key for a head da list
     if(strcmp(key, current->entry->key) == 0){
         entry_destroy(current->entry);
