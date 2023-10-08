@@ -72,6 +72,13 @@ int list_add(struct list_t *list, struct entry_t *entry)
     newNode->entry = entry;
     newNode->next = NULL;
 
+    // Se a lsta estiver vazia o novo nó e a head
+    if (list->head == NULL)
+    {
+        list->head = newNode;
+        list->size++;
+        return 0;
+    }
 }
 
 /* Função que elimina da lista a entry com a chave key, libertando a
