@@ -86,9 +86,34 @@ int list_add(struct list_t *list, struct entry_t *entry)
  * Retorna 0 se encontrou e removeu a entry, 1 se não encontrou a entry,
  * ou -1 em caso de erro.
  */
-int list_remove(struct list_t *list, char *key)
-{
-    return NULL;
+int list_remove(struct list_t *list, char *key){
+    if(list == NULL || key == NULL){
+        return -1;
+    }
+    struct node_t *current = list->head;
+    
+    // Se a key for a head da list
+    if(strcmp(key, current->entry->key) == 0){
+        entry_destroy(current->entry);
+        list->head = current->next;
+        free(current);
+        list->size--;
+        return 0;
+    }
+    // Se a key estiver na tail da list
+    while (current != NULL){
+        struct node_t *next = current->next;
+        if(strcmp(key, next->entry->key) == 0){
+            entry_destroy(next->entry);
+            current->next = next->next;
+            free(next);
+            list->size--;
+            return 0;
+        }
+        current = current->next;
+    }
+    
+    return -1;
 }
 
 /* Função que obtém da lista a entry com a chave key.
