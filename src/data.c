@@ -1,7 +1,7 @@
 // Rodrigo Barrocas 53680
-// Pedro Marques XXXXX
+// Pedro Vaz 46368
 // Matheus Nunes 47883
-// Grupo XX
+// Grupo 58
 
 #include "data.h"
 #include <stdlib.h>
@@ -14,23 +14,7 @@
  * Retorna a nova estrutura ou NULL em caso de erro.
  */
 struct data_t *data_create(int size, void *data){
-    struct data_t *p;
-    if (size <= 0)
-        return NULL;
-    if (data == NULL)
-        return NULL;
-    p = (struct data_t *)malloc(sizeof(struct data_t));
-    if (p == NULL)
-        return NULL;
-    p->data = (void *)malloc(size); // Estas 3 linhas deveriam estar aqui tendo em conta
-    if (p->data == NULL)            //  a definição da função?
-        free(p);                    // MAIS ESTA
-    memcpy(p->data, data, size);
-    p->datasize = size;
-
-    return p;
-
-    /* MATHEUS
+  
     // Validar args
     if(data == NULL || size <= 0){
         return NULL;
@@ -43,7 +27,7 @@ struct data_t *data_create(int size, void *data){
     newData->data = data;
     newData->datasize = size;
     return newData;
-    */
+    
 
 
     
@@ -54,14 +38,7 @@ struct data_t *data_create(int size, void *data){
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
 int data_destroy(struct data_t *data){
-    if (data != NULL)
-        if (data->data != NULL)
-            free(data->data);
 
-    free(data);
-    return 0;
-
-    /* MATHEUS
     // Validar args
     if(data == NULL || data->data == NULL){
         return -1;
@@ -69,7 +46,6 @@ int data_destroy(struct data_t *data){
     free(data->data);
     free(data);
     return 0;
-    */
 }
 
 /* Função que duplica uma estrutura data_t, reservando a memória
@@ -77,17 +53,7 @@ int data_destroy(struct data_t *data){
  * Retorna a nova estrutura ou NULL em caso de erro.
  */
 struct data_t *data_dup(struct data_t *data){
-    if (data == NULL)
-        return NULL;
-    struct data_t *p = data_create(data->datasize, data->data);
-    if (p == NULL)
-        return NULL;
-    if (data->data == NULL)
-        return NULL;
-    memcpy(p->data, data->data, data->datasize);
-    return p;
 
-    /* Matheus
     // Validar args
     if(data == NULL || data->data == NULL || data->datasize <=0){
         return NULL;
@@ -102,7 +68,7 @@ struct data_t *data_dup(struct data_t *data){
     }
     memcpy(newData->data, data->data, data->datasize);
     newData->datasize = data->datasize;
-    return newData;*/
+    return newData;
 }
 
 /* Função que substitui o conteúdo de um elemento de dados data_t.
@@ -110,21 +76,6 @@ struct data_t *data_dup(struct data_t *data){
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
 int data_replace(struct data_t *data, int new_size, void *new_data){
-    if (new_data == NULL)
-        return -1;
-    if (new_size == NULL)
-        return -1;
-    if (data == NULL)
-        return -1;
-    free(data->data);
-    data->data = (void *)malloc(new_size);
-    memcpy(data->data, new_data, new_size);
-    data->datasize = new_size;
-    if (data->data == NULL)
-        return -1;
-    return 0;
-
-    /* MAtheus
     // Validar args
     if(data == NULL || new_size <= 0 || new_data == NULL){
         return -1; 
@@ -140,6 +91,5 @@ int data_replace(struct data_t *data, int new_size, void *new_data){
     memcpy(data->data, new_data, new_size);
     data->datasize = new_size;
     return 0;
-    */
 
 }
