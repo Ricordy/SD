@@ -1,7 +1,7 @@
 // Rodrigo Barrocas 53680
-// Pedro Marques XXXXX
+// Pedro Vaz 46368
 // Matheus Nunes 47883
-// Grupo XX
+// Grupo 58
 
 #include "data.h"
 #include "entry.h"
