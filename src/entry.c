@@ -114,6 +114,18 @@ int entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value
  * 1 se entry1 > entry2 ou -2 em caso de erro.
  */
 int entry_compare(struct entry_t *entry1, struct entry_t *entry2){
-    // TO-DO
-    return -1;
+    if(entry1 == NULL || entry2 == NULL || entry1->key == NULL || entry2->key == NULL){
+        return -2;
+    }
+
+    int result = strcmp(entry1->key, entry2->key);
+    if(result == 0){
+        return 0;
+    } else if (result < 0){
+        return -1;
+    } else{
+        return 1;
+    }
+    
+    return -2;
 }
