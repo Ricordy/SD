@@ -35,21 +35,19 @@ struct entry_t *entry_create(char *key, struct data_t *data){
  */
 int entry_destroy(struct entry_t *entry){
     // Validar args
-    if(entry == NULL){
+    if(entry == NULL || entry->key == NULL){
         return -1;
     }
 
 
     // Eliminar e Validar se nao houve erros
     if(data_destroy(entry->value) == -1){
-        printf("Entrou");
         return -1;
     }
 
     // Libertar memoria do restante
     free(entry->key);
     free(entry);
-
     return 0;
 }
 
@@ -117,5 +115,5 @@ int entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value
  */
 int entry_compare(struct entry_t *entry1, struct entry_t *entry2){
     // TO-DO
-    return 0;
+    return -1;
 }
