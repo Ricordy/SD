@@ -58,7 +58,20 @@ int list_destroy(struct list_t *list)
  */
 int list_add(struct list_t *list, struct entry_t *entry)
 {
-    return NULL;
+    // Verificar parametros
+    if (list == NULL || entry == NULL)
+        return -1;
+
+    // Criar esturtura para o novo nó
+    struct node_t *newNode = malloc(sizeof(struct node_t));
+    // Verificar se o espaço foi alocado corretamente
+    if (newNode == NULL)
+        return -1;
+
+    // Passar a informação para 
+    newNode->entry = entry;
+    newNode->next = NULL;
+
 }
 
 /* Função que elimina da lista a entry com a chave key, libertando a
