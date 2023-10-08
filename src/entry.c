@@ -127,7 +127,5 @@ int entry_compare(struct entry_t *entry1, struct entry_t *entry2){
         return 1;
     }
     
-
-    // TO-DO
-    return -1;
+    return -2;
 }
