@@ -3,14 +3,15 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/inc"
+                "${workspaceFolder}/inc",
+                "${workspaceFolder}/tests"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "windows-gcc-x86"
