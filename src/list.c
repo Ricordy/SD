@@ -24,18 +24,23 @@ struct list_t *list_create(){
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
 int list_destroy(struct list_t *list){
-    if(list == NULL){
+    if (list == NULL)
         return -1;
-    }
-    struct node_t *current = list->head;
-    while (current != NULL){
-        int result = entry_destroy(current->entry);
-        struct node_t currToDelete = current;
-        current = current->next;
-        /* code */
-    }
-    
-    return NULL;
+
+    recursive_destroy(list->head); // Recursivamente destruir cada nó
+    free(list);                    // Libertar o espaço em memória da lista
+    return 0;
+}
+
+/* Função auxiliar que elimina um nó da lista e chama a si mesma para eliminar o próximo nó */
+void recursive_destroy(struct node_t *node)
+{
+    if (node == NULL)
+        return;
+
+    recursive_destroy(node->next); // Destruir recursivamente o nó seguinte
+    entry_destroy(node->entry);    // Destroi a entrada na
+    free(node);                    // Libertar o espaço em memória do node
 }
 
 /* Função que adiciona à lista a entry passada como argumento.
