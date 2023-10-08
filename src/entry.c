@@ -7,6 +7,7 @@
 #include "entry.h"
 #include "string.h"
 #include "stdlib.h"
+#include "stdio.h"
 
 
 /* Função que cria uma entry, reservando a memória necessária e
@@ -38,10 +39,10 @@ int entry_destroy(struct entry_t *entry){
         return -1;
     }
 
-    // Eliminar o data usando o metodo criado
-    int result = data_destroy(entry->value);
-    // Validar se nao houve erros
-    if(result == -1){
+
+    // Eliminar e Validar se nao houve erros
+    if(data_destroy(entry->value) == -1){
+        printf("Entrou");
         return -1;
     }
 
@@ -116,5 +117,5 @@ int entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value
  */
 int entry_compare(struct entry_t *entry1, struct entry_t *entry2){
     // TO-DO
-    return NULL;
+    return 0;
 }
