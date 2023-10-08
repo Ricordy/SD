@@ -14,7 +14,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
 $(OBJDIR)%.o: %.c
-	@mkdir -p $(@D)
+	@mkdir -p $(@D)§
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
