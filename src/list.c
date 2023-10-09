@@ -6,6 +6,19 @@
 #include "stdlib.h"
 #include "stdio.h"
 
+void list_print(struct list_t *list)
+{
+    printf("tamanho da lista: \n %i", list->size);
+    struct node_t *current = list->head;
+    while (current != NULL)
+    {
+        printf("########################## \n");
+        printf("entry: %s valueSize: %d \n", current->entry->key, current->entry->value->datasize);
+        printf("########################## \n");
+        current = current->next;
+    }
+    return;
+}
 
 /* Função que cria e inicializa uma nova lista (estrutura list_t a
  * ser definida pelo grupo no ficheiro list-private.h).
@@ -62,13 +75,17 @@ int list_add(struct list_t *list, struct entry_t *entry)
 {
     // Verificar parametros
     if (list == NULL || entry == NULL)
+    {
         return -1;
+    }
 
     // Criar esturtura para o novo nó
     struct node_t *newNode = malloc(sizeof(struct node_t));
     // Verificar se o espaço foi alocado corretamente
     if (newNode == NULL)
+    {
         return -1;
+    }
 
     // Passar a informação para
     newNode->entry = entry;
@@ -79,7 +96,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     {
         list->head = newNode;
         list->size++;
-        printf("Entrou na cabeca no ADD   ");
+
         return 0;
     }
 
@@ -106,17 +123,19 @@ int list_add(struct list_t *list, struct entry_t *entry)
                 previous->next = newNode; // colocar no nó anterior a informação deste no
 
             newNode->next = current; // Colocar no novo nó a informação de quem é o proximo nó
-            list->size++; 
-            printf("PPFFF PASSA AQUI");           // Aumentar o tamanho da lista
+            list->size++;            // Aumentar o tamanho da lista
             return 0;
         }
         else // Continuar a procura
         {
             previous = current; // Alterar as variavel de ajuda
             current = current->next;
-            printf((current==NULL)?"FOI ISTO":"NAO");
         }
     }
+    // Caso não tenha sido encontrado durante o ciclo o seu lugar na lista
+    previous->next = newNode; // Colocar no final da lista
+    list->size++;             // Aumentar o tamanho da lista
+    return 0;
 }
 
 /* Função que elimina da lista a entry com a chave key, libertando a
@@ -124,67 +143,82 @@ int list_add(struct list_t *list, struct entry_t *entry)
  * Retorna 0 se encontrou e removeu a entry, 1 se não encontrou a entry,
  * ou -1 em caso de erro.
  */
-int list_remove(struct list_t *list, char *key){
-    if(list == NULL || key == NULL || list->head == NULL){
+int list_remove(struct list_t *list, char *key)
+{
+    // Verificação de parametros
+    if (list == NULL || key == NULL || list->head == NULL)
+    {
         return -1;
     }
+
+    // Criação de variaveis de apoio
     struct node_t *current = list->head;
-    //printf((current->next == NULL)?"   ERRADO na class list":"OK");
-    // Se a key for a head da list
-    if(strcmp(key, current->entry->key) == 0){
-        list->head = current->next;
-        entry_destroy(current->entry);
-        free(current);
-        list->size--;
-        return 0;
-    }
-    // Se a key estiver na tail da list
-    while (current != NULL){
-        struct node_t *next = current->next;
-        if(strcmp(key, next->entry->key) == 0){
-            entry_destroy(next->entry);
-            current->next = next->next;
-            free(next);
+    struct node_t *previous = NULL;
+
+    while (current != NULL)
+    {
+        if (strcmp(key, current->entry->key) == 0)
+        {
+            if (previous == NULL)
+            {
+                // Key is in the head of the list
+                list->head = current->next;
+            }
+            else
+            {
+                // Key is in the middle or tail of the list
+                previous->next = current->next;
+            }
+
+            entry_destroy(current->entry);
+            free(current);
             list->size--;
-            return 0;
+            return 0; // Key found and removed
         }
+
+        previous = current;
         current = current->next;
     }
-    
-    return -1;
+
+    return 1; // Key not found in the list
 }
 
 /* Função que obtém da lista a entry com a chave key.
  * Retorna a referência da entry na lista ou NULL se não encontrar a
  * entry ou em caso de erro.
  */
-struct entry_t *list_get(struct list_t *list, char *key){
-    if(list == NULL || key == NULL || list->head == NULL){
-       // printf("Entrou no NULL");
+struct entry_t *list_get(struct list_t *list, char *key)
+{
+    if (list == NULL || key == NULL || list->head == NULL)
+    {
         return NULL;
     }
 
     struct node_t *current = list->head;
-    while (current != NULL){
-       // printf("1 vez");
-        if(strcmp(key, current->entry->key) == 0){
+    while (current != NULL)
+    {
+        if (strcmp(key, current->entry->key) == 0)
+        {
             return current->entry;
         }
         current = current->next;
     }
 
-    // Caso não exista    
-   // printf("nao existe");
+    // Caso não exista
+    // printf("nao existe");
     return NULL;
 }
 
 /* Função que conta o número de entries na lista passada como argumento.
  * Retorna o tamanho da lista ou -1 em caso de erro.
  */
-int list_size(struct list_t *list){
-    if(list == NULL){
+int list_size(struct list_t *list)
+{
+    if (list == NULL)
+    {
         return -1;
     }
+
     return list->size;
 }
 
@@ -193,8 +227,33 @@ int list_size(struct list_t *list){
  * reservando toda a memória necessária.
  * Retorna o array de strings ou NULL em caso de erro.
  */
-char **list_get_keys(struct list_t *list){
-    return NULL;
+char **list_get_keys(struct list_t *list)
+{
+    // Verificação de parametros
+    if (list == NULL)
+    {
+        return NULL;
+    }
+
+    // Alocar espaço necessário para o array de keys
+    char **keys = malloc((list->size + 1) * sizeof(char *));
+    if (keys == NULL)
+    {
+        return NULL; // Erro na alocação de memória
+    }
+
+    // Criação de uma variavel de apoio com o valor do nó atual
+    struct node_t *current = list->head; // Valor inicial - cabeça da list
+    int counter = 0;                     // Variavel de contagem
+    while (current != NULL)              // Ciclo para correr cada nó
+    {
+        keys[counter] = strdup(current->entry->key); // Colocar a key no novo array
+        current = current->next;                     // Atualizar a variavel de apoio
+        counter++;                                   // Aumentar o contador
+    }
+
+    keys[counter] = NULL; // Colocar o valor NULL no ultimo elemento do array
+    return keys;          // retorno do novo array de chaves
 }
 
 /* Função que liberta a memória ocupada pelo array de keys obtido pela
@@ -203,5 +262,16 @@ char **list_get_keys(struct list_t *list){
  */
 int list_free_keys(char **keys)
 {
-    return NULL;
+    // Verificação de parametros
+    if (keys == NULL)
+        return -1;
+
+    int counter = 0;              // Variavel de controlo do ciclo
+    while (keys[counter] != NULL) // Ciclo para libertar cada posição do array da memória
+    {
+        free(keys[counter]); // Libertar a posição atual
+        counter++;           // Mover o contador para a proxima posição
+    }
+    free(keys); // Libertar as chaves
+    return 0;
 }

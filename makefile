@@ -1,22 +1,63 @@
+CFLAGS = -Wall -I inc
 CC = gcc
-CFLAGS = -Wall -Iinc
-TSTEXESRC = testsExe/
-OBJDIR = obj/
+SRC = src/
+SRCTST = tests/
+INCLUDE = inc/
+OBJ = obj/
 
-TARGET = $(TSTEXESRC)test_data $(TSTEXESRC)test_list $(TSTEXESRC)test_entry
-SRCS = tests/test_data.c tests/test_list.c tests/test_entry.c src/data.c src/list.c src/entry.c
-OBJS = $(patsubst %.c,$(OBJDIR)%.o,$(SRCS))
+OBJECTS = $(OBJ)data.o $(OBJ)entry.o $(OBJ)list.o $(OBJ)test_data.o $(OBJ)test_entry.o $(OBJ)test_list.o $(OBJ)test_serialization.o $(OBJ)test_table.o
 
-all: $(TARGET)
+all: out
 
+out: data entry list test_data test_entry test_list test_serialization test_table
 
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+data: $(OBJ)data.o
 
-$(OBJDIR)%.o: %.c
-	@mkdir -p $(@D)§
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ)data.o: $(SRC)data.c $(INCLUDE)data.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+entry: $(OBJ)entry.o
+
+$(OBJ)entry.o: $(SRC)entry.c $(INCLUDE)data.h $(INCLUDE)entry.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+list: $(OBJ)list.o
+
+$(OBJ)list.o: $(SRC)list.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)list.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+test_data: $(OBJ)test_data.o $(OBJ)data.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ)test_data.o: $(SRCTST)test_data.c $(INCLUDE)data.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+test_entry: $(OBJ)test_entry.o $(OBJ)data.o $(OBJ)entry.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ)test_entry.o: $(SRCTST)test_entry.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+test_list: $(OBJ)test_list.o $(OBJ)data.o $(OBJ)list.o $(OBJ)entry.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ)test_list.o: $(SRCTST)test_list.c  $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)list.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+test_serialization: $(OBJ)test_serialization.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ)test_serialization.o: $(SRCTST)test_serialization.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)serialization.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+test_table: $(OBJ)test_table.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+$(OBJ)test_table.o: $(SRCTST)test_table.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)table.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
+correr_test_data:
+	$(CC) -g $(SRCTST)test_data.c $(OBJ)data.o -o test_data
 
 clean:
-	rm -f $(TARGET)
-	rm -rf $(OBJDIR)
+	rm -rf $(OBJ) *.o test_data
