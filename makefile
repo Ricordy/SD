@@ -1,9 +1,10 @@
-CFLAGS = -Wall -I inc
+CFLAGS = -Wall -I include
 CC = gcc
-SRC = src/
+SRC = source/
 SRCTST = tests/
-INCLUDE = inc/
-OBJ = obj/
+INCLUDE = include/
+OBJ = object/
+OUTPUTSRC= binary/
 
 OBJECTS = $(OBJ)data.o $(OBJ)entry.o $(OBJ)list.o $(OBJ)table.o $(OBJ)test_data.o $(OBJ)test_entry.o $(OBJ)test_list.o $(OBJ)test_table.o  # $(OBJ)test_serialization.o
 
