@@ -8,8 +8,8 @@ int key_hash(char *key, int l)
 {
     if (key == NULL)
         return -1;
-    if (l < 1)
-        return 1;
+    // if (l < 1)
+    //     return -1;
     int length = strlen(key);
     int soma = 0;
     int i;
@@ -59,6 +59,7 @@ struct table_t *table_create(int n)
         index++;
     }
     // Guarda na estrutura table o tamanho da tabela criada
+    table->size = n;
     return table;
 }
 
@@ -102,13 +103,12 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
     if (entryNova == NULL)
         return -1;
     int numeroEntrada = key_hash(key, table->size);
-    printf("numero entrada: %d", numeroEntrada);
     if (list_add(table->lists[numeroEntrada], entryNova) == -1)
     {
         entry_destroy(entryNova);
         return -1;
     }
-    table->size++;
+    table->numElem++;
     return 0;
 }
 
@@ -159,8 +159,7 @@ int table_size(struct table_t *table)
 {
     if (table == NULL)
         return -1;
-    printf("%d", table->size);
-    return table->size;
+    return table->numElem;
 }
 
 /* Função que devolve um array de char* com a cópia de todas as keys da

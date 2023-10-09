@@ -3,9 +3,11 @@
 
 #include "list.h"
 
-struct table_t {
+struct table_t
+{
 	struct list_t **lists;
 	int size;
+	int numElem;
 };
 
 /* Função que calcula o índice da lista a partir da chave

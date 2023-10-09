@@ -76,10 +76,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     // Verificar parametros
     if (list == NULL || entry == NULL)
     {
-        if (entry == NULL)
-            printf("aquix2");
-        if (list == NULL)
-            printf("list");
+
         return -1;
     }
 
@@ -88,11 +85,8 @@ int list_add(struct list_t *list, struct entry_t *entry)
     // Verificar se o espaço foi alocado corretamente
     if (newNode == NULL)
     {
-        printf("node null");
         return -1;
     }
-
-    printf("PAssei");
 
     // Passar a informação para
     newNode->entry = entry;
