@@ -104,7 +104,6 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
 
     if (list_add(table->lists[numeroEntrada], entryNova) == -1)
     {
-        printf("deu merda");
         entry_destroy(entryNova);
         return -1;
     }

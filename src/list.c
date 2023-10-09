@@ -73,10 +73,12 @@ int list_destroy(struct list_t *list)
  */
 int list_add(struct list_t *list, struct entry_t *entry)
 {
+    printf("entrei");
     // Verificar parametros
     if (list == NULL || entry == NULL)
     {
         return -1;
+        printf("aqui");
     }
 
     // Criar esturtura para o novo nó
@@ -85,7 +87,10 @@ int list_add(struct list_t *list, struct entry_t *entry)
     if (newNode == NULL)
     {
         return -1;
+        printf("node null");
     }
+
+    printf("PAssei");
 
     // Passar a informação para
     newNode->entry = entry;
