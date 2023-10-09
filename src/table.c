@@ -9,7 +9,7 @@ int key_hash(char *key, int l)
     if (key == NULL)
         return -1;
     if (l < 1)
-        return -1;
+        return 1;
     int length = strlen(key);
     int soma = 0;
     int i;
@@ -94,6 +94,7 @@ int table_destroy(struct table_t *table)
  */
 int table_put(struct table_t *table, char *key, struct data_t *value)
 {
+
     if (table == NULL || key == NULL || value == NULL)
         return -1;
 
@@ -101,14 +102,13 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
     if (entryNova == NULL)
         return -1;
     int numeroEntrada = key_hash(key, table->size);
-
+    printf("numero entrada: %d", numeroEntrada);
     if (list_add(table->lists[numeroEntrada], entryNova) == -1)
     {
         entry_destroy(entryNova);
         return -1;
     }
     table->size++;
-    printf("aquiii 2 %d", table->size);
     return 0;
 }
 

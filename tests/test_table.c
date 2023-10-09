@@ -50,7 +50,6 @@ int testPutInexistente()
 		table_put(table, key[i], data[i]);
 	}
 
-	printf(" Aquiiiiiii %d", table_size(table));
 	assert(table_size(table) == 1024);
 	result = (table_size(table) == 1024);
 
