@@ -230,7 +230,7 @@ int list_size(struct list_t *list)
 char **list_get_keys(struct list_t *list)
 {
     // Verificação de parametros
-    if (list == NULL)
+    if (list == NULL || list->head == NULL)
     {
         return NULL;
     }
