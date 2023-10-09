@@ -46,27 +46,28 @@ int testPutInexistente()
 		key[i] = (char *)malloc(16 * sizeof(char));
 		sprintf(key[i], "a/key/b-%d", i);
 		data[i] = data_create(strlen(key[i]) + 1, strdup(key[i]));
-
 		table_put(table, key[i], data[i]);
 	}
 
-	// assert(table_size(table) == 1024);
+	assert(table_size(table) == 1024);
 	result = (table_size(table) == 1024);
 
+	for (i = 0; i < 1024; i++)
+	{
+
+		d = table_get(table, key[i]);
+
+		assert(d->datasize == data[i]->datasize);
+		assert(memcmp(d->data, data[i]->data, d->datasize) == 0);
+		assert(d->data != data[i]->data);
+
+		result = result && (d->datasize == data[i]->datasize && memcmp(d->data, data[i]->data, d->datasize) == 0 && d->data != data[i]->data);
+		data_destroy(d);
+	}
+
 	// for (i = 0; i < 1024; i++)
 	// {
-	// 	d = table_get(table, key[i]);
 
-	// 	assert(d->datasize == data[i]->datasize);
-	// 	assert(memcmp(d->data, data[i]->data, d->datasize) == 0);
-	// 	assert(d->data != data[i]->data);
-
-	// 	result = result && (d->datasize == data[i]->datasize && memcmp(d->data, data[i]->data, d->datasize) == 0 && d->data != data[i]->data);
-	// 	data_destroy(d);
-	// }
-
-	// for (i = 0; i < 1024; i++)
-	// {
 	// 	free(key[i]);
 	// 	data_destroy(data[i]);
 	// }
@@ -97,6 +98,7 @@ int testPutExistente()
 		table_put(table, key[i], data[i]);
 	}
 
+	printf("tamanho %d \n ", table_size(table));
 	assert(table_size(table) == 1024);
 	result = (table_size(table) == 1024);
 
@@ -104,11 +106,14 @@ int testPutExistente()
 	table_put(table, key[256], d);
 	data_destroy(d);
 
+	printf("tamanho  2 %d \n ", table_size(table));
 	assert(table_size(table) == 1024);
+	printf("olaaa");
 	result = result && (table_size(table) == 1024);
-
+	printf("heyyy");
 	for (i = 0; i < 1024; i++)
 	{
+
 		d = table_get(table, key[i]);
 
 		if (i == 256)
@@ -126,11 +131,11 @@ int testPutExistente()
 		data_destroy(d);
 	}
 
-	for (i = 0; i < 1024; i++)
-	{
-		free(key[i]);
-		data_destroy(data[i]);
-	}
+	// for (i = 0; i < 1024; i++)
+	// {
+	// 	free(key[i]);
+	// 	data_destroy(data[i]);
+	// }
 
 	table_destroy(table);
 
@@ -160,6 +165,7 @@ int testDelInexistente()
 		data_destroy(data);
 	}
 
+	printf("oi");
 	assert(table_size(table) == 1024);
 	result = (table_size(table) == 1024);
 
@@ -174,6 +180,8 @@ int testDelInexistente()
 
 	assert(table_size(table) == 1024);
 	result = result && (table_size(table) == 1024);
+
+	printf("aqui");
 
 	table_destroy(table);
 

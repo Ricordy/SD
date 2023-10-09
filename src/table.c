@@ -4,12 +4,12 @@
 #include "table.h"
 #include "list.c"
 
-int key_hash(char *key, int l)
+int key_hash(char *key, int n)
 {
     if (key == NULL)
         return -1;
-    // if (l < 1)
-    //     return -1;
+    if (n < 1)
+        return -1;
     int length = strlen(key);
     int soma = 0;
     int i;
@@ -26,7 +26,7 @@ int key_hash(char *key, int l)
         soma += key[length - 1];
         soma += key[length - 2];
     }
-    return soma % l;
+    return soma % n;
 }
 
 /* Função para criar e inicializar uma nova tabela hash, com n
@@ -60,6 +60,7 @@ struct table_t *table_create(int n)
     }
     // Guarda na estrutura table o tamanho da tabela criada
     table->size = n;
+    table->numElem = 0;
     return table;
 }
 
@@ -77,9 +78,16 @@ int table_destroy(struct table_t *table)
     int index = 0;
     while (index < table->size)
     {
-        list_destroy(table->lists[index]); // Destruir cada lista(item) da tabela
+
+        if (table->lists[index] != NULL && table->lists[index]->head != NULL && table->lists[index]->head->entry != NULL)
+        {
+
+            list_destroy(table->lists[index]); // Destruir cada lista(item) da tabela
+        }
+
         index++;
     }
+
     free(table->lists); // Libertar o espaço alocado para as listas
     free(table);        // Libertar a tabela
     return 0;
@@ -95,36 +103,36 @@ int table_destroy(struct table_t *table)
  */
 int table_put(struct table_t *table, char *key, struct data_t *value)
 {
-
+    // Verificação de paremetros
     if (table == NULL || key == NULL || value == NULL)
         return -1;
 
+    // Criar a nova entrada e reservar o espaço na memoria
     struct entry_t *entryNova = entry_create(key, value);
+    // Verificação da alocação da memória
     if (entryNova == NULL)
         return -1;
+    // Hash para definir a lista de entrada
     int numeroEntrada = key_hash(key, table->size);
+    // Colocar a nova entrada na lista e verificar se houve erros
     if (list_add(table->lists[numeroEntrada], entryNova) == -1)
     {
-        entry_destroy(entryNova);
+        entry_destroy(entryNova); // Destruir a entrada em caso de erro
         return -1;
     }
-    table->numElem++;
+    table->numElem++; // aumentar a variavel que controla o  numero de elementos na tabela
     return 0;
 }
 
-/* Função para obter da tabela o valor associado à chave key.
- * A função deve devolver uma cópia dos dados que terão de ser
- * libertados no contexto da função que chamou table_get, ou seja, a
- * função aloca memória para armazenar uma *CÓPIA* dos dados da tabela,
- * retorna o endereço desta memória com a cópia dos dados, assumindo-se
- * que esta memória será depois libertada pelo programa que chamou
- * a função.
- * Devolve NULL em caso de erro.
+/* Função que procura na tabela uma entry com a chave key.
+ * Retorna uma *CÓPIA* dos dados (estrutura data_t) nessa entry ou
+ * NULL se não encontrar a entry ou em caso de erro.
  */
 struct data_t *table_get(struct table_t *table, char *key)
 {
     if (table == NULL || key == NULL)
         return NULL;
+
     struct entry_t *entry;
     int numeroEntrada = key_hash(key, table->size);
     if ((entry = list_get(table->lists[numeroEntrada], key)) == NULL)
@@ -134,9 +142,10 @@ struct data_t *table_get(struct table_t *table, char *key)
     return data_dup(entry->value);
 }
 
-/* Função para remover um elemento da tabela, indicado pela chave key,
- * libertando toda a memória alocada na respetiva operação table_put.
- * Retorna 0 (ok) ou -1 (key not found).
+/* Função que remove da lista a entry com a chave key, libertando a
+ * memória ocupada pela entry.
+ * Retorna 0 se encontrou e removeu a entry, 1 se não encontrou a entry,
+ * ou -1 em caso de erro.
  */
 int table_remove(struct table_t *table, char *key)
 {
@@ -148,7 +157,7 @@ int table_remove(struct table_t *table, char *key)
     {
         return -1;
     }
-    table->size--;
+    table->numElem--;
     return 0;
 }
 
@@ -159,12 +168,25 @@ int table_size(struct table_t *table)
 {
     if (table == NULL)
         return -1;
-    return table->numElem;
+
+    int totalSize = 0;
+
+    for (int i = 0; i < table->size; i++)
+    {
+        if (table->lists[i] != NULL)
+        {
+
+            totalSize += list_size(table->lists[i]);
+        }
+    }
+
+    return totalSize;
 }
 
-/* Função que devolve um array de char* com a cópia de todas as keys da
+/* Função que constrói um array de char* com a cópia de todas as keys na
  * tabela, colocando o último elemento do array com o valor NULL e
  * reservando toda a memória necessária.
+ * Retorna o array de strings ou NULL em caso de erro.
  */
 char **table_get_keys(struct table_t *table)
 {
@@ -201,7 +223,9 @@ char **table_get_keys(struct table_t *table)
     return listaKeys;
 }
 
-/* Função que liberta toda a memória alocada por table_get_keys().
+/* Função que liberta a memória ocupada pelo array de keys obtido pela
+ * função table_get_keys.
+ * Retorna 0 (OK) ou -1 em caso de erro.
  */
 int table_free_keys(char **keys)
 {
