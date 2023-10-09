@@ -5,11 +5,11 @@ SRCTST = tests/
 INCLUDE = inc/
 OBJ = obj/
 
-OBJECTS = $(OBJ)data.o $(OBJ)entry.o $(OBJ)list.o $(OBJ)test_data.o $(OBJ)test_entry.o $(OBJ)test_list.o # $(OBJ)test_serialization.o $(OBJ)test_table.o
+OBJECTS = $(OBJ)data.o $(OBJ)entry.o $(OBJ)list.o $(OBJ)table.o $(OBJ)test_data.o $(OBJ)test_entry.o $(OBJ)test_list.o $(OBJ)test_table.o  # $(OBJ)test_serialization.o
 
 all: out
 
-out: data entry list test_data test_entry test_list # test_serialization test_table
+out: data entry list test_data test_entry test_list test_table # test_serialization
 
 data: $(OBJ)data.o
 
@@ -25,6 +25,12 @@ list: $(OBJ)list.o
 
 $(OBJ)list.o: $(SRC)list.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)list.h
 	$(CC) -c $(CFLAGS) $< -o $@
+
+table: $(OBJ)table.o
+
+$(OBJ)table.o: $(SRC)table.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)table.h
+	$(CC) -c $(CFLAGS) $< -o $@
+
 
 test_data: $(OBJ)test_data.o $(OBJ)data.o
 	$(CC) $(CFLAGS) $^ -o $@
@@ -50,10 +56,10 @@ test_serialization: $(OBJ)test_serialization.o
 $(OBJ)test_serialization.o: $(SRCTST)test_serialization.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)serialization.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
-test_table: $(OBJ)test_table.o
-	$(CC) $(CFLAGS) $^ -o $@
+test_table: $(OBJ)test_table.o $(OBJ)data.o $(OBJ)entry.o  $(OBJ)table.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-$(OBJ)test_table.o: $(SRCTST)test_table.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)table.h
+$(OBJ)test_table.o: $(SRCTST)test_table.c $(INCLUDE)data.h $(INCLUDE)entry.h $(INCLUDE)table.h $(INCLUDE)list.h
 	$(CC) -c $(CFLAGS) $< -o $@
 
 correr_test_data:
