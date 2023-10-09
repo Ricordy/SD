@@ -73,12 +73,14 @@ int list_destroy(struct list_t *list)
  */
 int list_add(struct list_t *list, struct entry_t *entry)
 {
-    printf("entrei");
     // Verificar parametros
     if (list == NULL || entry == NULL)
     {
+        if (entry == NULL)
+            printf("aquix2");
+        if (list == NULL)
+            printf("list");
         return -1;
-        printf("aqui");
     }
 
     // Criar esturtura para o novo nó
@@ -86,8 +88,8 @@ int list_add(struct list_t *list, struct entry_t *entry)
     // Verificar se o espaço foi alocado corretamente
     if (newNode == NULL)
     {
-        return -1;
         printf("node null");
+        return -1;
     }
 
     printf("PAssei");
