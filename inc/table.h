@@ -26,8 +26,8 @@ int table_destroy(struct table_t *table);
  */
 int table_put(struct table_t *table, char *key, struct data_t *value);
 
-/* Função que procura na tabela uma entry com a chave key. 
- * Retorna uma *CÓPIA* dos dados (estrutura data_t) nessa entry ou 
+/* Função que procura na tabela uma entry com a chave key.
+ * Retorna uma *CÓPIA* dos dados (estrutura data_t) nessa entry ou
  * NULL se não encontrar a entry ou em caso de erro.
  */
 struct data_t *table_get(struct table_t *table, char *key);
@@ -44,14 +44,14 @@ int table_remove(struct table_t *table, char *key);
  */
 int table_size(struct table_t *table);
 
-/* Função que constrói um array de char* com a cópia de todas as keys na 
+/* Função que constrói um array de char* com a cópia de todas as keys na
  * tabela, colocando o último elemento do array com o valor NULL e
  * reservando toda a memória necessária.
  * Retorna o array de strings ou NULL em caso de erro.
  */
 char **table_get_keys(struct table_t *table);
 
-/* Função que liberta a memória ocupada pelo array de keys obtido pela 
+/* Função que liberta a memória ocupada pelo array de keys obtido pela
  * função table_get_keys.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */

@@ -6,20 +6,6 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-void list_print(struct list_t *list)
-{
-    printf("tamanho da lista: \n %i", list->size);
-    struct node_t *current = list->head;
-    while (current != NULL)
-    {
-        printf("########################## \n");
-        printf("entry: %s valueSize: %d \n", current->entry->key, current->entry->value->datasize);
-        printf("########################## \n");
-        current = current->next;
-    }
-    return;
-}
-
 /* Função que cria e inicializa uma nova lista (estrutura list_t a
  * ser definida pelo grupo no ficheiro list-private.h).
  * Retorna a lista ou NULL em caso de erro.
@@ -39,12 +25,14 @@ struct list_t *list_create()
 /* Função auxiliar que elimina um nó da lista e chama a si mesma para eliminar o próximo nó */
 void recursive_destroy(struct node_t *node)
 {
-    if (node == NULL)
+    if (node == NULL || node->entry == NULL)
         return;
 
     recursive_destroy(node->next); // Destruir recursivamente o nó seguinte
-    entry_destroy(node->entry);    // Destroi a entrada na
-    free(node);                    // Libertar o espaço em memória do node
+
+    entry_destroy(node->entry); // Destroi a entrada na
+
+    free(node); // Libertar o espaço em memória do node
 }
 
 /* Função que elimina uma lista, libertando *toda* a memória utilizada
@@ -57,7 +45,8 @@ int list_destroy(struct list_t *list)
         return -1;
 
     recursive_destroy(list->head); // Recursivamente destruir cada nó
-    free(list);                    // Libertar o espaço em memória da lista
+
+    free(list); // Libertar o espaço em memória da lista
     return 0;
 }
 
@@ -76,6 +65,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     // Verificar parametros
     if (list == NULL || entry == NULL)
     {
+
         return -1;
     }
 
@@ -161,26 +151,26 @@ int list_remove(struct list_t *list, char *key)
         {
             if (previous == NULL)
             {
-                // Key is in the head of the list
+               
                 list->head = current->next;
             }
             else
             {
-                // Key is in the middle or tail of the list
+
                 previous->next = current->next;
             }
 
             entry_destroy(current->entry);
             free(current);
             list->size--;
-            return 0; // Key found and removed
+            return 0; 
         }
 
         previous = current;
         current = current->next;
     }
 
-    return 1; // Key not found in the list
+    return 1; 
 }
 
 /* Função que obtém da lista a entry com a chave key.
@@ -204,8 +194,6 @@ struct entry_t *list_get(struct list_t *list, char *key)
         current = current->next;
     }
 
-    // Caso não exista
-    // printf("nao existe");
     return NULL;
 }
 
@@ -219,7 +207,16 @@ int list_size(struct list_t *list)
         return -1;
     }
 
-    return list->size;
+    int count = 0;
+    struct node_t *current = list->head;
+
+    while (current != NULL)
+    {
+        count++;
+        current = current->next;
+    }
+
+    return count;
 }
 
 /* Função que constrói um array de char* com a cópia de todas as keys na

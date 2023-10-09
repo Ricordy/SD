@@ -16,8 +16,7 @@ void pee(const char *msg)
 }
 
 /**************************************************************/
-int testEmptyList()
-{
+int testEmptyList() {
 	struct list_t *list = list_create();
 
 	printf("Módulo list -> testEmptyList: ");
@@ -26,14 +25,13 @@ int testEmptyList()
 	int result = (list != NULL) && (list_size(list) == 0);
 
 	list_destroy(list);
-
-	printf("%s\n", result ? "passou" : "não passou");
+	
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testAddFirst()
-{
+int testAddFirst() {
 	int result;
 	char *key = strdup("abc");
 	struct data_t *value = data_create(4, strdup("1234"));
@@ -49,18 +47,17 @@ int testAddFirst()
 	assert(list_add(list, NULL) == -1);
 	result = result && (list_add(list, NULL) == -1);
 	result = result && (list_add(list, entry) == 0);
-	result = result && (list_get(list, "abc") == entry);
+	result = result && (list_get(list,"abc") == entry);
 	result = result && (list_size(list) == 1);
 
 	list_destroy(list);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testAdd123RemoveHead()
-{
+int testAdd123RemoveHead() {
 	int result;
 	char *key1 = strdup("abc1");
 	char *key2 = strdup("abc2");
@@ -77,26 +74,22 @@ int testAdd123RemoveHead()
 	fflush(stdout);
 
 	result = (list_add(list, entry1) == 0);
-
 	result = result && (list_add(list, entry2) == 0);
-
 	result = result && (list_add(list, entry3) == 0);
 
 	result = result && (list_remove(list, "abc1") == 0);
-
 	result = result && (list_get(list, "abc2") == entry2);
 	result = result && (list_get(list, "abc3") == entry3);
 	result = result && (list_size(list) == 2);
 
 	list_destroy(list);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testAdd321RemoveMiddle()
-{
+int testAdd321RemoveMiddle() {
 	int result;
 	char *key1 = strdup("abc1");
 	char *key2 = strdup("abc2");
@@ -121,13 +114,14 @@ int testAdd321RemoveMiddle()
 	result = result && (list_get(list, "abc3") == entry3);
 	result = result && (list_size(list) == 2);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	list_destroy(list);
+
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testAdd132RemoveTail()
-{
+int testAdd132RemoveTail() {
 	int result;
 	char *key1 = strdup("abc1");
 	char *key2 = strdup("abc2");
@@ -144,27 +138,22 @@ int testAdd132RemoveTail()
 	fflush(stdout);
 
 	result = (list_add(list, entry1) == 0);
-
 	result = result && (list_add(list, entry3) == 0);
-
 	result = result && (list_add(list, entry2) == 0);
 
 	result = result && (list_remove(list, "abc3") == 0);
-
 	result = result && (list_get(list, "abc1") == entry1);
-
 	result = result && (list_get(list, "abc2") == entry2);
 	result = result && (list_size(list) == 2);
 
 	list_destroy(list);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testAdd123RemoveOther()
-{
+int testAdd123RemoveOther() {
 	int result;
 	char *key1 = strdup("abc1");
 	char *key2 = strdup("abc2");
@@ -189,13 +178,12 @@ int testAdd123RemoveOther()
 
 	list_destroy(list);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testInsertDupKey()
-{
+int testInsertDupKey() {
 	int result;
 	char *key1 = strdup("abc1");
 	char *key2 = strdup("abc2");
@@ -230,13 +218,12 @@ int testInsertDupKey()
 
 	list_destroy(list);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int testGetKeys()
-{
+int testGetKeys() {
 	int result;
 	char *key1 = strdup("abc1");
 	char *key2 = strdup("abc2");
@@ -265,7 +252,10 @@ int testGetKeys()
 
 	keys = list_get_keys(list);
 
-	result = result && (strcmp(keys[0], entry1->key) == 0) && (keys[0] != entry1->key) && (strcmp(keys[1], entry2->key) == 0) && (keys[1] != entry2->key) && (strcmp(keys[2], entry3->key) == 0) && (keys[2] != entry3->key) && keys[3] == NULL;
+	result = result && (strcmp(keys[0], entry1->key) == 0) && (keys[0] != entry1->key)
+                        && (strcmp(keys[1], entry2->key) == 0) && (keys[1] != entry2->key) 
+                        && (strcmp(keys[2], entry3->key) == 0) && (keys[2] != entry3->key)
+                        && keys[3] == NULL;
 
 	assert(list_free_keys(NULL) == -1);
 	result = result && (list_free_keys(NULL) == -1);
@@ -274,13 +264,12 @@ int testGetKeys()
 
 	list_destroy(list);
 
-	printf("%s\n", result ? "passou" : "não passou");
+	printf("%s\n",result?"passou":"não passou");
 	return result;
 }
 
 /**************************************************************/
-int main()
-{
+int main() {
 	int score = 0;
 
 	printf("\nIniciando teste do módulo list \n");
@@ -288,7 +277,7 @@ int main()
 	score += testEmptyList();
 
 	score += testAddFirst();
-
+	
 	score += testAdd123RemoveHead();
 
 	score += testAdd321RemoveMiddle();
@@ -304,7 +293,7 @@ int main()
 	printf("teste list (score): %d/8\n", score);
 
 	if (score == 8)
-		return 0;
+        	return 0;
 	else
-		return -1;
+        	return -1;
 }

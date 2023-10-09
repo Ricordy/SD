@@ -9,19 +9,21 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-
 /* Função que cria uma entry, reservando a memória necessária e
  * inicializando-a com a string e o bloco de dados de entrada.
  * Retorna a nova entry ou NULL em caso de erro.
  */
-struct entry_t *entry_create(char *key, struct data_t *data){
+struct entry_t *entry_create(char *key, struct data_t *data)
+{
     // Validar args
-    if(key == NULL || data == NULL){
+    if (key == NULL || data == NULL)
+    {
         return NULL;
     }
 
     struct entry_t *newEntry = malloc(sizeof(struct entry_t));
-    if(newEntry == NULL){
+    if (newEntry == NULL)
+    {
         return NULL; // Erro a reservar memoria
     }
     newEntry->key = key;
@@ -33,15 +35,18 @@ struct entry_t *entry_create(char *key, struct data_t *data){
 /* Função que elimina uma entry, libertando a memória por ela ocupada.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
-int entry_destroy(struct entry_t *entry){
+int entry_destroy(struct entry_t *entry)
+{
     // Validar args
-    if(entry == NULL || entry->key == NULL){
+    if (entry == NULL || entry->key == NULL || entry->value == NULL)
+    {
         return -1;
     }
 
-
     // Eliminar e Validar se nao houve erros
-    if(data_destroy(entry->value) == -1){
+    if (data_destroy(entry->value) == -1)
+    {
+
         return -1;
     }
 
@@ -55,28 +60,33 @@ int entry_destroy(struct entry_t *entry){
  * nova estrutura.
  * Retorna a nova entry ou NULL em caso de erro.
  */
-struct entry_t *entry_dup(struct entry_t *entry){
+struct entry_t *entry_dup(struct entry_t *entry)
+{
     // Validar args
-    if(entry == NULL || entry->key == NULL || entry->value == NULL){
+    if (entry == NULL || entry->key == NULL || entry->value == NULL)
+    {
         return NULL;
     }
 
     // Reservar memoria para a struct
     struct entry_t *newEntry = malloc(sizeof(struct entry_t));
-    if(newEntry == NULL){
+    if (newEntry == NULL)
+    {
         return NULL; // Erro a reserver memoria
     }
 
     // Duplicar key
-    newEntry->key = malloc(strlen(entry->key)+1);
-    if(newEntry->key == NULL){
-        return NULL; //Erro a reservar memoria
+    newEntry->key = malloc(strlen(entry->key) + 1);
+    if (newEntry->key == NULL)
+    {
+        return NULL; // Erro a reservar memoria
     }
     strcpy(newEntry->key, entry->key);
 
     // Duplicar data
     newEntry->value = data_dup(entry->value);
-    if(newEntry->value == NULL){
+    if (newEntry->value == NULL)
+    {
         return NULL; // Erro a duplicar data
     }
 
@@ -88,16 +98,21 @@ struct entry_t *entry_dup(struct entry_t *entry){
  * pelos conteúdos antigos da mesma.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
-int entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value){
-    if(entry == NULL || new_key == NULL || new_value == NULL){
+int entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value)
+{
+    if (entry == NULL || new_key == NULL || new_value == NULL)
+    {
         return -1;
     }
-    if(entry->key != NULL){
+    if (entry->key != NULL)
+    {
         free(entry->key);
     }
-    if(entry->value != NULL){
+    if (entry->value != NULL)
+    {
         int result = data_destroy(entry->value);
-        if(result == -1){
+        if (result == -1)
+        {
             return -1;
         }
     }
@@ -113,19 +128,26 @@ int entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value
  * Retorna 0 se as chaves forem iguais, -1 se entry1 < entry2,
  * 1 se entry1 > entry2 ou -2 em caso de erro.
  */
-int entry_compare(struct entry_t *entry1, struct entry_t *entry2){
-    if(entry1 == NULL || entry2 == NULL || entry1->key == NULL || entry2->key == NULL){
+int entry_compare(struct entry_t *entry1, struct entry_t *entry2)
+{
+    if (entry1 == NULL || entry2 == NULL || entry1->key == NULL || entry2->key == NULL)
+    {
         return -2;
     }
 
     int result = strcmp(entry1->key, entry2->key);
-    if(result == 0){
+    if (result == 0)
+    {
         return 0;
-    } else if (result < 0){
+    }
+    else if (result < 0)
+    {
         return -1;
-    } else{
+    }
+    else
+    {
         return 1;
     }
-    
+
     return -2;
 }

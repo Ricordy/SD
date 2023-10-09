@@ -6,6 +6,7 @@
 #include "data.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 /* Função que cria um novo elemento de dados data_t e que inicializa
  * os dados de acordo com os argumentos recebidos, sem necessidade de
@@ -39,11 +40,15 @@ int data_destroy(struct data_t *data)
 {
 
     // Validar args
-    if (data == NULL || data->data == NULL)
+    if (data == NULL)
     {
         return -1;
     }
-    free(data->data);
+
+    if (data->data != NULL)
+    {
+        free(data->data);
+    }
     free(data);
     return 0;
 }
