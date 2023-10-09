@@ -1,4 +1,8 @@
-#include "data.h"
+// Rodrigo Barrocas 53680
+// Pedro Vaz 46368
+// Matheus Nunes 47883
+// Grupo 58#include "data.h"
+
 #include "entry.h"
 #include "list.h"
 #include "list-private.h"
@@ -151,7 +155,7 @@ int list_remove(struct list_t *list, char *key)
         {
             if (previous == NULL)
             {
-               
+
                 list->head = current->next;
             }
             else
@@ -163,14 +167,14 @@ int list_remove(struct list_t *list, char *key)
             entry_destroy(current->entry);
             free(current);
             list->size--;
-            return 0; 
+            return 0;
         }
 
         previous = current;
         current = current->next;
     }
 
-    return 1; 
+    return 1;
 }
 
 /* Função que obtém da lista a entry com a chave key.

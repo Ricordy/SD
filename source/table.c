@@ -1,3 +1,8 @@
+// Rodrigo Barrocas 53680
+// Pedro Vaz 46368
+// Matheus Nunes 47883
+// Grupo 58
+
 #include <stdlib.h>
 #include <string.h>
 #include "table-private.h"
