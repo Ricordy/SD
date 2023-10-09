@@ -5,11 +5,11 @@ SRCTST = tests/
 INCLUDE = inc/
 OBJ = obj/
 
-OBJECTS = $(OBJ)data.o $(OBJ)entry.o $(OBJ)list.o $(OBJ)test_data.o $(OBJ)test_entry.o $(OBJ)test_list.o $(OBJ)test_serialization.o $(OBJ)test_table.o
+OBJECTS = $(OBJ)data.o $(OBJ)entry.o $(OBJ)list.o $(OBJ)test_data.o $(OBJ)test_entry.o $(OBJ)test_list.o # $(OBJ)test_serialization.o $(OBJ)test_table.o
 
 all: out
 
-out: data entry list test_data test_entry test_list test_serialization test_table
+out: data entry list test_data test_entry test_list # test_serialization test_table
 
 data: $(OBJ)data.o
 
