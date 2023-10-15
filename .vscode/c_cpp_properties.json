@@ -3,9 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/inc",
-                "${workspaceFolder}/tests",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/tests"
             ],
             "defines": [
                 "_DEBUG",
