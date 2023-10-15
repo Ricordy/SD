@@ -1,6 +1,6 @@
 Por fazer: 
 
-[i14]: https://github.com/Ricordy/SD/issues/14
+[i14]  #14
 [i15]: https://github.com/Ricordy/SD/issues/15
 [i16]: https://github.com/Ricordy/SD/issues/16
 [i17]: https://github.com/Ricordy/SD/issues/17
