@@ -40,7 +40,7 @@ int list_remove(struct list_t *list, char *key);
 /* Função que obtém da lista a entry com a chave key.
  * Retorna a referência da entry na lista ou NULL se não encontrar a
  * entry ou em caso de erro.
- */
+*/
 struct entry_t *list_get(struct list_t *list, char *key);
 
 /* Função que conta o número de entries na lista passada como argumento.
@@ -48,14 +48,14 @@ struct entry_t *list_get(struct list_t *list, char *key);
  */
 int list_size(struct list_t *list);
 
-/* Função que constrói um array de char* com a cópia de todas as keys na
+/* Função que constrói um array de char* com a cópia de todas as keys na 
  * lista, colocando o último elemento do array com o valor NULL e
  * reservando toda a memória necessária.
  * Retorna o array de strings ou NULL em caso de erro.
  */
 char **list_get_keys(struct list_t *list);
 
-/* Função que liberta a memória ocupada pelo array de keys obtido pela
+/* Função que liberta a memória ocupada pelo array de keys obtido pela 
  * função list_get_keys.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
