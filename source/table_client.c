@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     char comando[MAX_MSG];         // Guarda todo a frase do comando
     const char divisor[3] = " \n"; // Array usado para divisão
     char *operacao;                // Guarda operacao
-    char *key;                     // Guarda chave na tabela
+    char *key;                     // Guarda chave da tabela
     char *dados;                   // Guarda dados a modificar
 
     // Cicle de funcionamento do cliente
@@ -69,9 +69,16 @@ int main(int argc, char **argv)
             }
             else if ((strcmp(operacao, "size") == 0)) // Comando SIZE
             {
+                int tamanho = rtable_size(rtable);
+                printf("Tamanho -> %d\n", tamanho);
             }
-            else if (strcmp(operacao, "del") == 0) // Comando SIZE
+            else if (strcmp(operacao, "del") == 0) // Comando DEL
             {
+                key = strtok(NULL, divide);
+                if (key == 0)
+                {
+                    printf("Este comando necessita de mais um parametro: del <key>")
+                }
             }
             else if (strcmp(operacao, "get") == 0) // Comando GET
             {
