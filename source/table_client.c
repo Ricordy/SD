@@ -50,12 +50,22 @@ int main(int argc, char **argv)
         // Comando invalido
         if (operacao == 0)
         {
+            printf("Introduza um comando valido!\n");
+            printf("Lista de comandos validos:\n");
+            printf(" size\n");
+            printf(" del <key>\n");
+            printf(" get <key>\n");
+            printf(" put <key> <data>\n");
+            printf(" getkeys\n");
+            printf(" quit\n");
         }
         // Comando valido
         else
         {
             if (strcmp(operacao, "quit") == 0) // Comando QUIT
             {
+                printf("A terminar a ligacao...\n");
+                break;
             }
             else if ((strcmp(operacao, "size") == 0)) // Comando SIZE
             {
@@ -72,7 +82,7 @@ int main(int argc, char **argv)
             else // Comando intruduzido é invalido
             {
                 printf("Introduza um comando valido!\n");
-                printf("Comandos validos:\n");
+                printf("Lista de comandos validos:\n");
                 printf(" size\n");
                 printf(" del <key>\n");
                 printf(" get <key>\n");
