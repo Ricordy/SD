@@ -6,3 +6,5 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+
+#define MAX_MSG 2048

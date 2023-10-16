@@ -29,5 +29,55 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    
-}
+    // Criação de variaveis auxilares
+    char comando[MAX_MSG];         // Guarda todo a frase do comando
+    const char divisor[3] = " \n"; // Array usado para divisão
+    char *operacao;                // Guarda operacao
+    char *key;                     // Guarda chave na tabela
+    char *dados;                   // Guarda dados a modificar
+
+    // Cicle de funcionamento do cliente
+    while (1)
+    {
+        printf("Introduza uma acao: ");
+        if (fgets(comando, MAX_MSG, stdin) == NULL) // Verificar se a acao existe
+        {
+            printf("Nao introduziu nenhum comando!\n");
+            break;
+        }
+
+        operacao = strtok(comando, divisor);
+        // Comando invalido
+        if (operacao == 0)
+        {
+        }
+        // Comando valido
+        else
+        {
+            if (strcmp(operacao, "quit") == 0) // Comando QUIT
+            {
+            }
+            else if ((strcmp(operacao, "size") == 0)) // Comando SIZE
+            {
+            }
+            else if (strcmp(operacao, "del") == 0) // Comando SIZE
+            {
+            }
+            else if (strcmp(operacao, "get") == 0) // Comando GET
+            {
+            }
+            else if (strcmp(operacao, "put") == 0) // Comando PUT
+            {
+            }
+            else // Comando intruduzido é invalido
+            {
+                printf("Introduza um comando valido!\n");
+                printf("Comandos validos:\n");
+                printf(" size\n");
+                printf(" del <key>\n");
+                printf(" get <key>\n");
+                printf(" put <key> <data>\n");
+                printf(" getkeys\n");
+                printf(" quit\n");
+            }
+        }
