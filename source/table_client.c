@@ -74,17 +74,49 @@ int main(int argc, char **argv)
             }
             else if (strcmp(operacao, "del") == 0) // Comando DEL
             {
-                key = strtok(NULL, divide);
-                if (key == 0)
+                key = strtok(NULL, divisor);
+                if (key == NULL) // Verificar se foi passada uma key no comando
                 {
                     printf("Este comando necessita de mais um parametro: del <key>")
+                }
+                else // Caso em que a key foi passada
+                {
+                    if (rtable_del(rtable, key) == -1) // Eliminar e verificar o resultado da operação
+                    {
+                        printf("Erro a apagar, verifique a existencia da <key> na tabela\n"); // Mensagem de erro
+                    }
+                    else
+                    {
+                        printf("Eliminado com sucesso!\n"); // Mensagem de sucesso
+                    }
                 }
             }
             else if (strcmp(operacao, "get") == 0) // Comando GET
             {
+                key = strtok(NULL, divisor);
+                if (key == NULL) // Verificar se foi passada uma key no comando
+                {
+                    printf("Este comando necessita de mais um parametro: get <key>")
+                }
+                else
+                {
+                    struct data_t *dadosRecebidos;                          // Variavel de apoio para guardar dados/erro
+                    if ((dadosRecebidos = rtable_get(rtable, key)) == NULL) // Verificação da existencia dos dados na tabela e atribuição do valor à variavel
+                    {
+                        printf("Erro a obter o valor, key invalida!\n"); // Mensagem de erro
+                    }
+                    else
+                    {
+                        printf("Dados obtidos com sucesso\n");
+                        printf("Dados: %s \n", (char *)dadosRecebidos->data);
+                        data_destroy(dadosRecebidos); // Destruir variavel auxiliar
+                    }
+                }
             }
             else if (strcmp(operacao, "put") == 0) // Comando PUT
             {
+                key = strtok(NULL, divisor);
+                dados = strtok(NULL, "\n");
             }
             else // Comando intruduzido é invalido
             {
