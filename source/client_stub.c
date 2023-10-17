@@ -21,7 +21,7 @@ struct rtable_t *rtable_connect(char *address_port)
     tcp_table->server_port = htons(atoi(strtok(NULL, "")));
     tcp_table->sockfd = socket(AF_INET, SOCK_STREAM, 0); // Criação do socket para comunicação
 
-    if (tcp_table->sockfd == -1 || tcp_table->ip == NULL || tcp_table->port == -1) // Verificação da criação da estrutura
+    if (tcp_table->sockfd == -1 || tcp_table->server_address == NULL || tcp_table->server_port == -1) // Verificação da criação da estrutura
     {
         return NULL; // Retornar erro
     }
