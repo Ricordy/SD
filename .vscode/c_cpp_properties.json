@@ -3,9 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/inc",
                 "${workspaceFolder}/tests",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/arpa"
             ],
             "defines": [
                 "_DEBUG",
