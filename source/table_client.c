@@ -115,8 +115,46 @@ int main(int argc, char **argv)
             }
             else if (strcmp(operacao, "put") == 0) // Comando PUT
             {
-                key = strtok(NULL, divisor);
-                dados = strtok(NULL, "\n");
+                key = strtok(NULL, divisor); // Obter o valor da key
+                dados = strtok(NULL, "\n");  // Obter o valor dos dados
+                if (dados == NULL)
+                {
+                    printf("O comando necessita de mais um parametro, put <key> <data>\n");
+                }
+                else
+                {
+                    struct data_t *data = data_create(strlen(dados) + 1, dados);
+                    struct entry_t *entry = entry_create(key, data);
+                    if (rtable_put() == -1)
+                    {
+                        printf("Erro a colocar os dados na tabela!");
+                    }
+                    else
+                    {
+                        printf("Dados colocados com sucesso!");
+                    }
+                    free(data);
+                    free(entry);
+                }
+            }
+            else if (strcmp(operacao, "getkeys") == 0) // Comando GETKEYS
+            {
+                char **keys = rtable_get_keys(rtable); // Criação de variavel de apoio
+                if (keys == NULL)                      // Verificação dos dados obtidos na variavel de apoio
+                {
+                    printf("Erro a obter as keys!\n"); // Mensagem de erro
+                }
+                else
+                {
+                    int index;                                           // Variavel de apoio
+                    int numeroEntradas = rtable_size(rtable);            // Variavel de apoio com tamanho da tabela
+                    for (index = 0; index != numeroEntradas; index += 1) // Ciclio para imprimir as keys na tela
+                    {
+                        printf("%s \n", keys[index]);
+                    }
+                    // Libertar a memoria alocada pela variavel de apoio
+                    rtable_free_keys(keys);
+                }
             }
             else // Comando intruduzido é invalido
             {
