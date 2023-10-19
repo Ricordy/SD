@@ -51,7 +51,10 @@ int rtable_disconnect(struct rtable_t *rtable)
  * Se a key já existe, vai substituir essa entrada pelos novos dados.
  * Retorna 0 (OK, em adição/substituição), ou -1 (erro).
  */
-int rtable_put(struct rtable_t *rtable, struct entry_t *entry) {}
+int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
+{
+    MessageT msg;
+}
 
 /* Retorna o elemento da tabela com chave key, ou NULL caso não exista
  * ou se ocorrer algum erro.
@@ -76,7 +79,16 @@ char **rtable_get_keys(struct rtable_t *rtable) {}
 
 /* Liberta a memória alocada por rtable_get_keys().
  */
-void rtable_free_keys(char **keys) {}
+void rtable_free_keys(char **keys)
+{
+    int index = 0;              // Variavel de apoio para correr o array
+    while (keys[index] != NULL) // Correr o array em ciclo para libertar a memoria de cada key
+    {
+        free(keys[index]); // Libertação da memória
+        index += 1;
+    }
+    free(keys); // Libertação do espaço reservado pela variavel que continha cada todas keys
+}
 
 /* Retorna um array de entry_t* com todo o conteúdo da tabela, colocando
  * um último elemento do array a NULL. Retorna NULL em caso de erro.
@@ -85,4 +97,13 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable) {}
 
 /* Liberta a memória alocada por rtable_get_table().
  */
-void rtable_free_entries(struct entry_t **entries) {}
+void rtable_free_entries(struct entry_t **entries)
+{
+    int index = 0;                 // Variavel de apoio para correr o array
+    while (entries[index] != NULL) // Correr o array em ciclo para destruir cada entry
+    {
+        entry_destroy(keys[index]); // Destruição da entrada
+        index += 1;
+    }
+    free(entries); // Libertação do espaço reservado pela variavel que continha cada todas entries
+}
