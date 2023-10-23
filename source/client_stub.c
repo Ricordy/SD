@@ -2,7 +2,6 @@
 #include "network_client.h"
 #include "inet.h"
 #include "message-private.h"
-#include "protobuf-c/sdmessage.pb-c.h"
 
 /* Função para estabelecer uma associação entre o cliente e o servidor,
  * em que address_port é uma string no formato <hostname>:<port>.
@@ -32,7 +31,7 @@ struct rtable_t *rtable_connect(char *address_port)
     }
     else
     {
-        return tcp_table // Retornar estrutura conectada ao servidor
+        return tcp_table; // Retornar estrutura conectada ao servidor
     }
 }
 
@@ -53,14 +52,15 @@ int rtable_disconnect(struct rtable_t *rtable)
  */
 int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
 {
-    message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
-    if (mensagem == NULL)                                   // Verificação da alocação de espaço
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+
+    if (mensagem == NULL) // Verificação da alocação de espaço
     {
         return -1;
     }
 
-    _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
-    if (mensagemConvert == NULL)                                   // Verificação da alocação de espaço
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
     {
         return -1;
     }
@@ -71,10 +71,10 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY; // Colocar o tipo de dados
 
     // -------------------------------- VERIFICAR ESTAS LINHAS------------------------------------------------
-    mensagem->msgConvert->entry = entry;                       // colocar os dados na mensagem
-    mensagem->msgConvert->key = entry->key;                    // Colocar a chave da entrada
-    mensagem->msgConvert->value->len = entry->value->datasize; // Colocar o tamanho da data
-    mensagem->msgConvert->value->data = entry->value->data;    // Colocar a data
+    mensagem->msgConvert->entry = entry;                      // colocar os dados na mensagem
+    mensagem->msgConvert->key = entry->key;                   // Colocar a chave da entrada
+    mensagem->msgConvert->value.len = entry->value->datasize; // Colocar o tamanho da data
+    mensagem->msgConvert->value.data = entry->value->data;    // Colocar a data
     // -------------------------------------------------------------------------------------------------------
 
     mensagem = network_send_receive(rtable, mensagem);               // Escrever mensagem no socket
@@ -100,14 +100,14 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
  */
 struct data_t *rtable_get(struct rtable_t *rtable, char *key)
 {
-    message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
-    if (mensagem == NULL)                                   // Verificação da alocação de espaço
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+    if (mensagem == NULL)                                          // Verificação da alocação de espaço
     {
         return NULL;
     }
 
-    _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
-    if (mensagemConvert == NULL)                                   // Verificação da alocação de espaço
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
     {
         return NULL;
     }
@@ -133,8 +133,8 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
         return NULL;
     }
 
-    struct data_t *dataConvert = data_create(mensagem->msgConvert->value->len, mensagem->msgConvert->value->data); // Ciração de uma variavel que retenha o valor da data associada à key
-    mensagem->msgConvert->value->data = NULL;                                                                      // Colocar o valor da data a null
+    struct data_t *dataConvert = data_create(mensagem->msgConvert->value.len, mensagem->msgConvert->value.data); // Ciração de uma variavel que retenha o valor da data associada à key
+    mensagem->msgConvert->value.data = NULL;                                                                     // Colocar o valor da data a null
     message_t__free_unpacked(mensagem->msgConvert, NULL);
     free(mensagemConvert);
     free(mensagem);
@@ -182,7 +182,7 @@ void rtable_free_entries(struct entry_t **entries)
     int index = 0;                 // Variavel de apoio para correr o array
     while (entries[index] != NULL) // Correr o array em ciclo para destruir cada entry
     {
-        entry_destroy(keys[index]); // Destruição da entrada
+        entry_destroy(entries[index]); // Destruição da entrada
         index += 1;
     }
     free(entries); // Libertação do espaço reservado pela variavel que continha cada todas entries
