@@ -53,28 +53,35 @@ int rtable_disconnect(struct rtable_t *rtable)
  */
 int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
 {
-    message_t *mensagem = malloc(sizeof(struct message_t));
-    if (mensagem == NULL)
+    message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+    if (mensagem == NULL)                                   // Verificação da alocação de espaço
     {
         return -1;
     }
 
-    _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT));
+    _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
 
-    message_t__init(mensagemConvert);
-    mensagem->msgConvert = mensagemConvert;
-    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_PUT;
-    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY;
-    mensagem->msgConvert->data = entry->value->data;
-    mensagem->msgConvert->data_size = entry->value->datasize;
-    mensagem->msgConvert->key = entry->key;
-    mensagem = network_send_receive(rtable, mensagem);
-    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    message_t__init(mensagemConvert);                                // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                          // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_PUT;        // Colocar o opcode da operção
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY;      // Colocar o tipo de dados
+    mensagem->msgConvert->entry = entry;                             // colocar os dados na mensagem
+    mensagem->msgConvert->key = entry->key;                          // Colocar a chave da entrada
+    mensagem = network_send_receive(rtable, mensagem);               // Escrever mensagem no socket
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR) // Verificar operação de escrita no socket
     {
         printf("Erro na inserção da entrada!\n");
-        message_t__free_unpacked(msg->msgConvert, NULL);
-        free(msg);
+        message_t__free_unpacked(mensagem->msgConvert, NULL); // Libertar o espaço ocupado pela mensagem
+        free(mensagem);                                       // Libertar variavel de comunicação
         return -1;
+    }
+    else
+    {
+        free(mensagemConvert); // Libertar o espaço ocupado pela mensagem
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagem); // Libertar variavel de comunicação
+
+        return 0;
     }
 }
 

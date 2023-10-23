@@ -12,8 +12,8 @@ int write_all(int socket, void *buffer, int size)
         // Verificar o resultado da operação de escrita
         if ((index = write(socket, buffer, size)) < 0)
         {
-            perror("Erro na escrita, posição: %d", index); // Mensagem de erro
-            return index;                                  // Retornar o index do erro para verificar na função chamadora o sucesso da chamada a esta função
+            perror("Erro na escrita!"); // Mensagem de erro
+            return index;               // Retornar o index do erro para verificar na função chamadora o sucesso da chamada a esta função
         }
         size -= index;
         buffer += index;
@@ -33,8 +33,8 @@ int read_all(int socket, void *buffer, int size)
         // Verificar o resultado da operação de leitura
         if ((index = read(socket, buffer, size)) < 0)
         {
-            perror("Erro na leitura, posição: %d", index); // Mensagem de erro
-            return index;                                  // Retornar o index do erro para verificar na função chamadora o sucesso da chamada a esta função
+            perror("Erro na leitura!"); // Mensagem de erro
+            return index;               // Retornar o index do erro para verificar na função chamadora o sucesso da chamada a esta função
         }
         size -= index;
         buffer += index;

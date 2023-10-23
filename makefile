@@ -22,7 +22,7 @@ sdmessage:
 	mv sdmessage.pb-c.h $(INCLUDE)/
 
 
-client_stub.o: $(SRC)/client_stub.c  $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/network_client.h $(INCLUDE)/sdmessage.pb-c.h
+client_stub.o: $(SRC)/client_stub.c  $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/network_client.h $(INCLUDE)/protobuf-c/sdmessage.pb-c.h
 	$(CC) -c $(CFLAGS) $(SRC)/client_stub.c -o $(OBJ)/client_stub.o
 
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 
