@@ -168,7 +168,7 @@ int rtable_del(struct rtable_t *rtable, char *key)
     {
         return -1;
     }
-    // Enivar o pedido para o servidor e processar a resposta
+    // Enviar o pedido para o servidor e processar a resposta
     mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
     {
@@ -187,7 +187,42 @@ int rtable_del(struct rtable_t *rtable, char *key)
 
 /* Retorna o número de elementos contidos na tabela ou -1 em caso de erro.
  */
-int rtable_size(struct rtable_t *rtable) {}
+int rtable_size(struct rtable_t *rtable)
+{
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+
+    if (mensagem == NULL) // Verificação da alocação de espaço
+    {
+        return -1;
+    }
+
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
+    {
+        return -1;
+    }
+    message_t__init(mensagemConvert);                          // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                    // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_SIZE; // Colocar o opcode da operação
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE; // Colocar o tipo de dados no caso nenhum
+
+    // Enviar o pedido para o servidor e processar a resposta
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    {
+        // Imprimir erro e libertar memoria reservada
+        printf("Erro a obter numero de elementos da tabela\n");
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagem);
+        return -1;
+    }
+    // Libertar memoria reservada e retornar tamanho pedido
+    int tamanho = mensagem->msgConvert->n_keys;
+    message_t__free_unpacked(mensagem->msgConvert, NULL);
+    free(mensagemConvert);
+    free(mensagem);
+    return tamanho;
+}
 
 /* Retorna um array de char* com a cópia de todas as keys da tabela,
  * colocando um último elemento do array a NULL.
