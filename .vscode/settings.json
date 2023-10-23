@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "data.h": "c",
-        "network_client.h": "c"
+        "network_client.h": "c",
+        "socket.h": "c"
     }
 }

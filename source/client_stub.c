@@ -60,13 +60,23 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
     }
 
     _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                   // Verificação da alocação de espaço
+    {
+        return -1;
+    }
 
-    message_t__init(mensagemConvert);                                // Inicialização da variavel de apoio
-    mensagem->msgConvert = mensagemConvert;                          // Colocar a variavel de apoio na variavel de comunicação com o socket
-    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_PUT;        // Colocar o opcode da operção
-    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY;      // Colocar o tipo de dados
-    mensagem->msgConvert->entry = entry;                             // colocar os dados na mensagem
-    mensagem->msgConvert->key = entry->key;                          // Colocar a chave da entrada
+    message_t__init(mensagemConvert);                           // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                     // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_PUT;   // Colocar o opcode da operção
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY; // Colocar o tipo de dados
+
+    // -------------------------------- VERIFICAR ESTAS LINHAS------------------------------------------------
+    mensagem->msgConvert->entry = entry;                       // colocar os dados na mensagem
+    mensagem->msgConvert->key = entry->key;                    // Colocar a chave da entrada
+    mensagem->msgConvert->value->len = entry->value->datasize; // Colocar o tamanho da data
+    mensagem->msgConvert->value->data = entry->value->data;    // Colocar a data
+    // -------------------------------------------------------------------------------------------------------
+
     mensagem = network_send_receive(rtable, mensagem);               // Escrever mensagem no socket
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR) // Verificar operação de escrita no socket
     {
@@ -88,7 +98,48 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
 /* Retorna o elemento da tabela com chave key, ou NULL caso não exista
  * ou se ocorrer algum erro.
  */
-struct data_t *rtable_get(struct rtable_t *rtable, char *key) {}
+struct data_t *rtable_get(struct rtable_t *rtable, char *key)
+{
+    message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+    if (mensagem == NULL)                                   // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+
+    _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                   // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+
+    message_t__init(mensagemConvert);                         // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                   // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_GET; // Colocar o opcode da operção
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_KEY; // Colocar o tipo de dados
+    mensagem->msgConvert->key = key;                          // Colocar a key recebida
+    if (mensagem->msgConvert->key == NULL)                    // Verificar se houve algum erro na colocação da key recebida na variavel de comunicação
+    {
+        free(mensagem->msgConvert->key); // Libertar o espaço reservado
+        return NULL;
+    }
+    mensagem = network_send_receive(rtable, mensagem);               // Enivar o pedido ao servidor
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR) // Verificar se encontrou alguma key igual à pedida
+    {
+        printf("Erro a obter elemento da tabela\n");
+        // Libertar o espaço reservado
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagem);
+        // Retorno de não encontrar
+        return NULL;
+    }
+
+    struct data_t *dataConvert = data_create(mensagem->msgConvert->value->len, mensagem->msgConvert->value->data); // Ciração de uma variavel que retenha o valor da data associada à key
+    mensagem->msgConvert->value->data = NULL;                                                                      // Colocar o valor da data a null
+    message_t__free_unpacked(mensagem->msgConvert, NULL);
+    free(mensagemConvert);
+    free(mensagem);
+    return dataConvert;
+}
 
 /* Função para remover um elemento da tabela. Vai libertar
  * toda a memoria alocada na respetiva operação rtable_put().
