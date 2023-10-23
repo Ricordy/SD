@@ -71,14 +71,14 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY; // Colocar o tipo de dados
 
     // -------------------------------- VERIFICAR ESTAS LINHAS------------------------------------------------
-    mensagem->msgConvert->entry = entry;                      // colocar os dados na mensagem
+    // mensagem->msgConvert->entry = entry;                      // colocar os dados na mensagem
     mensagem->msgConvert->key = entry->key;                   // Colocar a chave da entrada
     mensagem->msgConvert->value.len = entry->value->datasize; // Colocar o tamanho da data
     mensagem->msgConvert->value.data = entry->value->data;    // Colocar a data
     // -------------------------------------------------------------------------------------------------------
 
-    mensagem = network_send_receive(rtable, mensagem);               // Escrever mensagem no socket
-    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR) // Verificar operação de escrita no socket
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert); // Escrever mensagem no socket
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)           // Verificar operação de escrita no socket
     {
         printf("Erro na inserção da entrada!\n");
         message_t__free_unpacked(mensagem->msgConvert, NULL); // Libertar o espaço ocupado pela mensagem
@@ -122,8 +122,8 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
         free(mensagem->msgConvert->key); // Libertar o espaço reservado
         return NULL;
     }
-    mensagem = network_send_receive(rtable, mensagem);               // Enivar o pedido ao servidor
-    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR) // Verificar se encontrou alguma key igual à pedida
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert); // Enivar o pedido ao servidor
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)           // Verificar se encontrou alguma key igual à pedida
     {
         printf("Erro a obter elemento da tabela\n");
         // Libertar o espaço reservado
