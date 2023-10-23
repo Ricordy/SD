@@ -145,7 +145,45 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
  * toda a memoria alocada na respetiva operação rtable_put().
  * Retorna 0 (OK), ou -1 (chave não encontrada ou erro).
  */
-int rtable_del(struct rtable_t *rtable, char *key) {}
+int rtable_del(struct rtable_t *rtable, char *key)
+{
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+
+    if (mensagem == NULL) // Verificação da alocação de espaço
+    {
+        return -1;
+    }
+
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
+    {
+        return -1;
+    }
+    message_t__init(mensagemConvert);                         // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                   // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_DEL; // Colocar o opcode da operção
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_KEY; // Colocar o tipo de dados
+    mensagem->msgConvert->key = key;                          // Colocar a chave da entrada recebida
+    if (mensagem->msgConvert->key == NULL)                    // Verificar se houve algum erro na colocação da key recebida na variavel de comunicação
+    {
+        return -1;
+    }
+    // Enivar o pedido para o servidor e processar a resposta
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    {
+        // Imprimir erro e libertar memoria reservada
+        printf("Erro a eliminar elemento da tabela\n");
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagem);
+        return -1;
+    }
+    // Libertar memoria reservada e retornar codigo de sucesso
+    message_t__free_unpacked(mensagem->msgConvert, NULL);
+    free(mensagemConvert);
+    free(mensagem);
+    return 0;
+}
 
 /* Retorna o número de elementos contidos na tabela ou -1 em caso de erro.
  */
