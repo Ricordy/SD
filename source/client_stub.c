@@ -1,8 +1,8 @@
-#include "client_stub_private.h"
+#include "client_stub-private.h"
 #include "network_client.h"
 #include "inet.h"
 #include "message-private.h"
-#include "sdmessage.pb-c.h"
+#include "protobuf-c/sdmessage.pb-c.h"
 
 /* Função para estabelecer uma associação entre o cliente e o servidor,
  * em que address_port é uma string no formato <hostname>:<port>.
@@ -53,7 +53,29 @@ int rtable_disconnect(struct rtable_t *rtable)
  */
 int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
 {
-    MessageT msg;
+    message_t *mensagem = malloc(sizeof(struct message_t));
+    if (mensagem == NULL)
+    {
+        return -1;
+    }
+
+    _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT));
+
+    message_t__init(mensagemConvert);
+    mensagem->msgConvert = mensagemConvert;
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_PUT;
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_ENTRY;
+    mensagem->msgConvert->data = entry->value->data;
+    mensagem->msgConvert->data_size = entry->value->datasize;
+    mensagem->msgConvert->key = entry->key;
+    mensagem = network_send_receive(rtable, mensagem);
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    {
+        printf("Erro na inserção da entrada!\n");
+        message_t__free_unpacked(msg->msgConvert, NULL);
+        free(msg);
+        return -1;
+    }
 }
 
 /* Retorna o elemento da tabela com chave key, ou NULL caso não exista
