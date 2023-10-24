@@ -4,39 +4,43 @@ SRC = source
 INCLUDE = include
 OBJ = object
 BIN = binary
-LIB = lib
 
-out:
-	make  message.o client_stub.o network_client.o network_server.o 
+EXECUTABLES = table_client 
+
+out: message.o client_stub.o network_client.o table_client.o sdmessage.o $(EXECUTABLES)
+
+
+table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o
+	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
 
 data.o: $(SRC)/data.c $(INCLUDE)/data.h
-	$(CC) -c $(CFLAGS) $(SRC)/data.c -o $(OBJ)/data.o
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 entry.o: $(SRC)/entry.c $(INCLUDE)/data.h $(INCLUDE)/entry.h
-	$(CC) -c $(CFLAGS) $(SRC)/entry.c -o $(OBJ)/entry.o
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
+sdmessage.o: $(SRC)/sdmessage.pb-c.c $(INCLUDE)/sdmessage.pb-c.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 sdmessage: 
 	protoc --c_out=. sdmessage.proto
 	mv sdmessage.pb-c.c $(SRC)/
 	mv sdmessage.pb-c.h $(INCLUDE)/
 
-
 client_stub.o: $(SRC)/client_stub.c $(INCLUDE)/client_stub.h  $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/network_client.h  $(INCLUDE)/message-private.h  $(INCLUDE)/client_stub-private.h
-	$(CC) -c $(CFLAGS) $(SRC)/client_stub.c -o $(OBJ)/client_stub.o
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+
+table_client.o: $(SRC)/table_client.c $(INCLUDE)/client_stub.h  $(INCLUDE)/network_client.h   $(INCLUDE)/client_stub-private.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 
-	$(CC) -c $(CFLAGS) $(SRC)/network_client.c -o $(OBJ)/network_client.o
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 network_server.o: $(SRC)/network_server.c $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h
-	$(CC) -c $(CFLAGS) $(SRC)/network_server.c -o $(OBJ)/network_server.o
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 message.o: $(SRC)/message.c $(INCLUDE)/message-private.h 
-	$(CC) -c $(CFLAGS) $(SRC)/message.c -o $(OBJ)/message.o
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 clean:
 	rm -f $(OBJ)/*
-	rm -f $(BIN)/*
-	rm -f $(LIB)/*
-	rm -f $(SRC)/sdmessage.pb-c.c
-	rm -f $(INCLUDE)/sdmessage.pb-c.h
