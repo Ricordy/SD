@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "data.h": "c",
+        "network_client.h": "c",
+        "socket.h": "c",
+        "sdmessage.pb-c.h": "c",
+        "message-private.h": "c",
+        "client_stub-private.h": "c",
+        "inet.h": "c",
+        "protobuf-c.h": "c"
         "signal.h": "c"
     }
 }

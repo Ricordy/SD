@@ -3,8 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
+                "${workspaceFolder}/tests",
                 "${workspaceFolder}/include",
-                "${workspaceFolder}/tests"
+                "/Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk/usr/include/arpa"
             ],
             "defines": [
                 "_DEBUG",
@@ -14,7 +15,8 @@
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++14",
-            "intelliSenseMode": "windows-gcc-x86"
+            "intelliSenseMode": "windows-gcc-x86",
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
