@@ -15,16 +15,15 @@ int network_connect(struct rtable_t *rtable)
 {
     printf("Entri no problema \n");
     // verificar se rtable é NULL
-    // if (rtable = NULL)
-    // {
-    //     fprintf(stderr, "rtable vazio.\n");
-    //     return -1;
-    // }
+    if (rtable->server_address == NULL || rtable->server_address == NULL || rtable->sockfd == NULL)
+    {
+        fprintf(stderr, "rtable vazio.\n");
+        return -1;
+    }
 
     // informações do servidor
-    printf("informações do servidor....\n");
-    rtable->socket.sin_family = AF_INET;                                          // Definiar Address Family (IPV4)
-    rtable->socket.sin_port = htons(rtable->server_port);                         // Converter para network byte order (big-endian)
+    rtable->socket.sin_family = AF_INET; // Definiar Address Family (IPV4)
+    rtable->socket.sin_port = htons(rtable->server_port); // Converter para network byte order (big-endian)
     if (inet_pton(AF_INET, rtable->server_address, &rtable->socket.sin_addr) < 1) // Transformação em binario
     {
         perror("Erro ao converter o endereço IP \n");
@@ -33,9 +32,9 @@ int network_connect(struct rtable_t *rtable)
     }
 
     // Conectar ao servidor
-    printf("Conexão ao servidor \n");
     if (connect(rtable->sockfd, (struct sockaddr *)&rtable->socket, sizeof(rtable->socket)) < 0) // Verificar a conexão
     {
+        printf("Connection failed \n");
         close(rtable->sockfd);
         return -1;
     }
