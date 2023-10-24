@@ -22,9 +22,10 @@ int main(int argc, char **argv)
     // Iniciar cliente
     printf("A iniciar cliente...\n");
     struct rtable_t *rtable; // Definição da variavel de comunicação
-
+    printf("PAntes 1.\n");
     rtable = rtable_connect(argv[1]); // Conectar ao servidor
-    if (rtable == 0)                  // Verificar a conexão
+    printf("PAssei potencial erro 1.\n");
+    if (rtable == 0) // Verificar a conexão
     {
         exit(1);
     }

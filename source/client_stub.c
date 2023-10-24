@@ -9,28 +9,36 @@
  */
 struct rtable_t *rtable_connect(char *address_port)
 {
+    printf("aqui.\n");
     // Criação e verificação da variavel que conterá a estrutura
     struct rtable_t *const tcp_table = malloc(sizeof(struct rtable_t));
     if (tcp_table == NULL)
     {
+        printf("Eastergg 1.\n");
         return NULL; // Retornar erro
     }
     // Preencher a estrutura com os dados passados nos argumentos
+    printf("Antes de preencher tcp_table.\n");
     tcp_table->server_address = strtok((char *)address_port, ":");
     tcp_table->server_port = htons(atoi(strtok(NULL, "")));
     tcp_table->sockfd = socket(AF_INET, SOCK_STREAM, 0); // Criação do socket para comunicação
-
+    printf("depois tcp_table.\n");
     if (tcp_table->sockfd == -1 || tcp_table->server_address == NULL || tcp_table->server_port == -1) // Verificação da criação da estrutura
     {
+        printf("erro na estrutura.\n");
         return NULL; // Retornar erro
     }
-
-    if (network_connect(tcp_table) == -1) // Tentar conectar ao servidor
+    printf("pre potencial erro 2\n ");
+    int networkstatus = network_connect(tcp_table);
+    printf("network status: %d ", networkstatus);
+    if (networkstatus == -1) // Tentar conectar ao servidor
     {
+        printf("merda\n");
         return NULL; // Retornar erro
     }
     else
     {
+        printf("sucesso 2\n");
         return tcp_table; // Retornar estrutura conectada ao servidor
     }
 }
