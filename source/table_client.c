@@ -6,7 +6,7 @@
 
 #include <signal.h>
 #include "network_client.h"
-#include "client_stub_private.h"
+#include "client_stub-private.h"
 #include "client_stub.h"
 #include "inet.h"
 
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
                 key = strtok(NULL, divisor);
                 if (key == NULL) // Verificar se foi passada uma key no comando
                 {
-                    printf("Este comando necessita de mais um parametro: del <key>")
+                    printf("Este comando necessita de mais um parametro: del <key>");
                 }
                 else // Caso em que a key foi passada
                 {
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
                 key = strtok(NULL, divisor);
                 if (key == NULL) // Verificar se foi passada uma key no comando
                 {
-                    printf("Este comando necessita de mais um parametro: get <key>")
+                    printf("Este comando necessita de mais um parametro: get <key>");
                 }
                 else
                 {
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
                 {
                     struct data_t *data = data_create(strlen(dados) + 1, dados);
                     struct entry_t *entry = entry_create(key, data);
-                    if (rtable_put() == -1)
+                    if (rtable_put(rtable, entry) == -1)
                     {
                         printf("Erro a colocar os dados na tabela!");
                     }
@@ -168,3 +168,5 @@ int main(int argc, char **argv)
                 printf(" quit\n");
             }
         }
+    }
+}
