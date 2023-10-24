@@ -115,8 +115,8 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
     message_t__init(mensagemConvert);                         // Inicialização da variavel de apoio
     mensagem->msgConvert = mensagemConvert;                   // Colocar a variavel de apoio na variavel de comunicação com o socket
     mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_GET; // Colocar o opcode da operção
-    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_KEY; // Colocar o tipo de dados
-    mensagem->msgConvert->key = key;                          // Colocar a key recebida
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_KEY; // Colocar o tipo de dados enviados
+    mensagem->msgConvert->key = key;                          // Colocar a key recebida nos parametros
     if (mensagem->msgConvert->key == NULL)                    // Verificar se houve algum erro na colocação da key recebida na variavel de comunicação
     {
         free(mensagem->msgConvert->key); // Libertar o espaço reservado
@@ -162,7 +162,7 @@ int rtable_del(struct rtable_t *rtable, char *key)
     message_t__init(mensagemConvert);                         // Inicialização da variavel de apoio
     mensagem->msgConvert = mensagemConvert;                   // Colocar a variavel de apoio na variavel de comunicação com o socket
     mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_DEL; // Colocar o opcode da operção
-    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_KEY; // Colocar o tipo de dados
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_KEY; // Colocar o tipo de dados enviados
     mensagem->msgConvert->key = key;                          // Colocar a chave da entrada recebida
     if (mensagem->msgConvert->key == NULL)                    // Verificar se houve algum erro na colocação da key recebida na variavel de comunicação
     {
@@ -204,7 +204,7 @@ int rtable_size(struct rtable_t *rtable)
     message_t__init(mensagemConvert);                          // Inicialização da variavel de apoio
     mensagem->msgConvert = mensagemConvert;                    // Colocar a variavel de apoio na variavel de comunicação com o socket
     mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_SIZE; // Colocar o opcode da operação
-    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE; // Colocar o tipo de dados no caso nenhum
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE; // Colocar o tipo de dados enviados no caso nenhum
 
     // Enviar o pedido para o servidor e processar a resposta
     mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
@@ -228,7 +228,43 @@ int rtable_size(struct rtable_t *rtable)
  * colocando um último elemento do array a NULL.
  * Retorna NULL em caso de erro.
  */
-char **rtable_get_keys(struct rtable_t *rtable) {}
+char **rtable_get_keys(struct rtable_t *rtable)
+{
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+    if (mensagem == NULL)                                          // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+    message_t__init(mensagemConvert);                             // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                       // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_GETKEYS; // Colocar o opcode da operação
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE;    // Colocar o tipo de dados enviados no caso nenhum
+
+    // Enviar o pedido para o servidor e processar a resposta
+    mensagem = network_send_receive(rtable, mensagem);
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    {
+        // Imprimir erro e libertar memoria reservada
+        printf("Erro a obter keys da tabela\n");
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagemConvert);
+        free(mensagem);
+        return NULL;
+    }
+    // Libertar memoria reservada e retornar as keys pedidas
+    char **keys = mensagem->msgConvert->keys;
+    mensagem->msgConvert->keys = NULL;
+    message_t__free_unpacked(mensagem->msgConvert, NULL);
+    free(mensagemConvert);
+    free(mensagem);
+    return keys;
+}
 
 /* Liberta a memória alocada por rtable_get_keys().
  */
@@ -246,7 +282,43 @@ void rtable_free_keys(char **keys)
 /* Retorna um array de entry_t* com todo o conteúdo da tabela, colocando
  * um último elemento do array a NULL. Retorna NULL em caso de erro.
  */
-struct entry_t **rtable_get_table(struct rtable_t *rtable) {}
+struct entry_t **rtable_get_table(struct rtable_t *rtable)
+{
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+    if (mensagem == NULL)                                          // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+    message_t__init(mensagemConvert);                              // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                        // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_GETTABLE; // Colocar o opcode da operação
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE;     // Colocar o tipo de dados enviados no caso nenhum
+
+    // Enviar o pedido para o servidor e processar a resposta
+    mensagem = network_send_receive(rtable, mensagem);
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    {
+        // Imprimir erro e libertar memoria reservada
+        printf("Erro a obter a tabela\n");
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagemConvert);
+        free(mensagem);
+        return NULL;
+    }
+    // Libertar memoria reservada e retornar as keys pedidas
+    entry_t **entries = mensagem->msgConvert->entries;
+    mensagem->msgConvert->entries = NULL;
+    message_t__free_unpacked(mensagem->msgConvert, NULL);
+    free(mensagemConvert);
+    free(mensagem);
+    return entries;
+}
 
 /* Liberta a memória alocada por rtable_get_table().
  */
