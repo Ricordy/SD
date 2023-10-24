@@ -8,5 +8,6 @@
         "client_stub-private.h": "c",
         "inet.h": "c",
         "protobuf-c.h": "c"
+        "signal.h": "c"
     }
 }
