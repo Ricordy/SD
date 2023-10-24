@@ -52,7 +52,7 @@ int network_connect(struct rtable_t *rtable)
 MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 {
 
-    int client_socket = rtable->socket;
+    int client_socket = rtable->sockfd;
 
     // Verificar se socket é válido
     if (client_socket == -1)
@@ -117,7 +117,7 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 
 int network_close(struct rtable_t *rtable)
 {
-    int client_socket = rtable->client_socket;
+    int client_socket = rtable->sockfd;
 
     // Verificar se socket é válido
     if (client_socket == -1)
@@ -134,7 +134,7 @@ int network_close(struct rtable_t *rtable)
     }
 
     // socket -1 = fechado
-    rtable->client_socket = -1;
+    rtable->sockfd = -1;
 
     return 0;
 }
