@@ -7,7 +7,7 @@ BIN = binary
 
 EXECUTABLES = table_client 
 
-out: message.o client_stub.o network_client.o table_client.o sdmessage.o $(EXECUTABLES)
+out: sdmessage message.o client_stub.o network_client.o table_client.o sdmessage.o $(EXECUTABLES)
 
 
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o
@@ -44,3 +44,6 @@ message.o: $(SRC)/message.c $(INCLUDE)/message-private.h
 
 clean:
 	rm -f $(OBJ)/*
+	rm -f $(SRC)/sdmessage.pb-c.c
+	rm -f $(INCLUDE)/sdmessage.pb-c.h
+	
