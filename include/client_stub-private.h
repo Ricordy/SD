@@ -4,7 +4,7 @@
 #include "client_stub.h"
 #include "inet.h"
 
-/* Remote table, que deve conter as informações necessáriaspara comunicar*com o servidor. A definir pelo grupo em client_stub-private.h*/
+/* Remote table, que deve conter as informações necessária para comunicar*com o servidor. A definir pelo grupo em client_stub-private.h*/
 struct rtable_t
 {
     char *server_address;

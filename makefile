@@ -7,7 +7,7 @@ BIN = binary
 LIB = lib
 
 out:
-	make  message.o network_client.o network_server.o 
+	make  message.o client_stub.o network_client.o network_server.o 
 
 data.o: $(SRC)/data.c $(INCLUDE)/data.h
 	$(CC) -c $(CFLAGS) $(SRC)/data.c -o $(OBJ)/data.o
@@ -22,7 +22,7 @@ sdmessage:
 	mv sdmessage.pb-c.h $(INCLUDE)/
 
 
-client_stub.o: $(SRC)/client_stub.c  $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/network_client.h  $(INCLUDE)/message-private.h 
+client_stub.o: $(SRC)/client_stub.c $(INCLUDE)/client_stub.h  $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/network_client.h  $(INCLUDE)/message-private.h  $(INCLUDE)/client_stub-private.h
 	$(CC) -c $(CFLAGS) $(SRC)/client_stub.c -o $(OBJ)/client_stub.o
 
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 

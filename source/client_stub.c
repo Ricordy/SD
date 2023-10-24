@@ -247,7 +247,7 @@ char **rtable_get_keys(struct rtable_t *rtable)
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE;    // Colocar o tipo de dados enviados no caso nenhum
 
     // Enviar o pedido para o servidor e processar a resposta
-    mensagem = network_send_receive(rtable, mensagem);
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
     {
         // Imprimir erro e libertar memoria reservada
@@ -301,7 +301,7 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable)
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE;     // Colocar o tipo de dados enviados no caso nenhum
 
     // Enviar o pedido para o servidor e processar a resposta
-    mensagem = network_send_receive(rtable, mensagem);
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
     {
         // Imprimir erro e libertar memoria reservada
@@ -312,7 +312,7 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable)
         return NULL;
     }
     // Libertar memoria reservada e retornar as keys pedidas
-    entry_t **entries = mensagem->msgConvert->entries;
+    struct entry_t **entries = mensagem->msgConvert->entries;
     mensagem->msgConvert->entries = NULL;
     message_t__free_unpacked(mensagem->msgConvert, NULL);
     free(mensagemConvert);
