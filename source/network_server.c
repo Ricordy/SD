@@ -61,7 +61,68 @@ int network_server_init(short port)
  * A função não deve retornar, a menos que ocorra algum erro. Nesse
  * caso retorna -1.
  */
-int network_main_loop(int listening_socket, struct table_t *table);
+int network_main_loop(int listening_socket)
+{
+    int connsockfd;               // Variavel para armazenar o descritor do socket
+    struct message_t *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
+
+    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
+    {
+        printf("Recebeu cliente!\n");
+        if (connsockfd == -1) // Verificação do socket recebido pela função accept
+        {
+            perror("Error no accept!\n");
+            return -1;
+        }
+
+        while (1) // Lidar com a conexão do cliente após esta ser aceite
+        {
+            msg = network_receive(connsockfd); // Receber a mensagem do cliente
+            if (msg == NULL)                   // Verificação da mensagem
+            {
+                message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
+                free(msg->msgConvert);                           // Libertar a mensagem recebida
+                free(msg);                                       // Libertar a estrutura de mensagem
+                close(connsockfd);                               // Fechar a conexão com o cliente
+                printf("Erro a receber mensagem!\n");
+                break; // Sair do loop
+            }
+            int inv = invoke(msg); // Executar a operação enviada pelo cliente
+            if (inv == -1)
+            {
+                message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
+                free(msg->msgConvert);                           // Libertar a mensagem recebida
+                free(msg);                                       // Libertar a estrutura de mensagem
+                close(connsockfd);                               // Fechar a conexão com o cliente
+                printf("Erro invoke!\n");
+                break; // Saia do loop interno em caso de erro
+            }
+            if (network_send(connsockfd, msg) == -1)
+            {
+                message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
+                free(msg->msgConvert);                           // Libertar a mensagem recebida
+                free(msg);                                       // Libertar a estrutura de mensagem
+                close(connsockfd);                               // Fechar a conexão com o cliente
+                printf("Erro a enviar mensagem!\n");
+                break; // Saia do loop interno em caso de erro
+            }
+            else
+            {
+                printf("Mensagem enviada!\n");
+            }
+        }
+    }
+
+    // Libertar recursos após o cliclo
+    if (msg != NULL)
+    {
+        message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
+        free(msg->msgConvert);                           // Libertar a mensagem recebida
+        free(msg);                                       // Libertar a estrutura de mensagem
+    }
+    close(connsockfd); // Fechar a conexão com o cliente
+    return 0;
+}
 
 /* A função network_receive() deve:
  * - Ler os bytes da rede, a partir do client_socket indicado;
