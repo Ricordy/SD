@@ -197,10 +197,57 @@ struct message_t *network_receive(int client_socket)
  * - Enviar a mensagem serializada, através do client_socket.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
-int network_send(int client_socket, MessageT *msg);
+int network_send(int client_socket, struct message_t *msg)
+{
+    // Serializar a mensagem
+    unsigned len;
+    uint8_t *buf = NULL;
+    len = message_t__get_packed_size(msg->msgConvert);
+    buf = malloc(len);
+    if (buf == NULL)
+    {
+        return -1; // Retorna -1 em caso de erro na alocação de memória
+    }
+
+    // Empacotar a mensagem na estrutura de dados
+    message_t__pack(msg->msgConvert, buf);
+
+    // Converter o tamanho da mensagem para a ordem de bytes da rede
+    int sizeEnviar = htonl(len);
+
+    // Enviar o tamanho do buffer
+    int sizeEnviado;
+    if ((sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(int)) != sizeof(int)) {
+        perror("Erro ao enviar tamanho do buffer ao servidor");
+        close(client_socket);
+        free(buf);
+        return -1; // Retorna -1 em caso de erro no envio do tamanho do buffer
+    }
+
+    // Libetar a memória ocupada pela mensagem
+    message_t__free_unpacked(msg->msgConvert, NULL);
+    free(msg);
+
+    //Enviar o buffer
+    int nbytes;
+    if ((nbytes = write_all(client_socket, buf, len) != len) {
+        perror("Erro ao enviar dados ao servidor");
+        close(client_socket);
+        free(buf);
+        return -1; // Retorna -1 em caso de erro no envio do buffer
+    }
+
+    // Libetar a memoria do buffer
+    free(buf);
+
+    return 0; // Retorna 0 em caso de sucesso
+}
 
 /* Liberta os recursos alocados por network_server_init(), nomeadamente
  * fechando o socket passado como argumento.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
-int network_server_close(int socket);
+int network_server_close(int socket)
+{
+    return close(sockfd);
+}
