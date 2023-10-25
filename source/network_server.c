@@ -130,7 +130,67 @@ int network_main_loop(int listening_socket)
  *   reservando a memória necessária para a estrutura MessageT.
  * Retorna a mensagem com o pedido ou NULL em caso de erro.
  */
-MessageT *network_receive(int client_socket);
+struct message_t *network_receive(int client_socket)
+{
+    int size; // Variavel de apoio para armazenar tmnh da mensagem
+
+    // Receber o tamanho da mensagem
+    if (read_all(client_socket, &size, sizeof(int)) <= 0)
+    {
+        printf("Erro a receber!\n");
+        return NULL;
+    }
+
+    // Converter o tamanho de rede de ordem de bytes da network para a ordem de bytes do host
+    size = ntohl(size);
+
+    // Verificar se o tamanho da mensagem é válido
+    if (size <= 0)
+    {
+        printf("Tamanho de mensagem inválido!\n");
+        return NULL;
+    }
+
+    // Alocar memória para o buffer da mensagem
+    uint8_t *buf = (uint8_t *)malloc(size);
+    if (buf == NULL)
+    {
+        perror("Erro ao alocar memória para a mensagem recebida");
+        return NULL;
+    }
+
+    // Receber a mensagem recorrendo ao read_all
+    if (read_all(client_socket, buf, size) != size)
+    {
+        free(buf);
+        perror("Erro ao receber dados do servidor");
+        return NULL;
+    }
+
+    // Aloca rmemória para a estrutura da mensagem
+    struct message_t *msgRecebida = (struct message_t *)malloc(sizeof(struct message_t));
+    if (msgRecebida == NULL)
+    {
+        free(buf);
+        perror("Erro ao alocar memória para a mensagem recebida");
+        return NULL;
+    }
+
+    // Deserializa a mensagem
+    msgRecebida->msgConvert = (struct _MessageT *)message_t__unpack(NULL, size, buf);
+    free(buf);
+
+    // Verifica se a deserialização foi bem-sucedida
+    if (msgRecebida->msgConvert == NULL)
+    {
+        free(msgRecebida);
+        perror("Erro ao deserializar a mensagem");
+        return NULL;
+    }
+
+    // Retorna a mensagem recebida
+    return msgRecebida;
+}
 
 /* A função network_send() deve:
  * - Serializar a mensagem de resposta contida em msg;
