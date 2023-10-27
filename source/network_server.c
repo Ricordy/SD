@@ -3,11 +3,11 @@
 #include "sdmessage.pb-c.h"
 
 // Informações do socket
-int sockfd;
-struct sockaddr_in server, client;
-char str[MAX_MSG + 1];
-int nbytes, count;
-socklen_t size_client;
+int sockfd;                        // Descritor do socket
+struct sockaddr_in server, client; // Estruturas para armazenar informações do servidor e do cliente
+char str[MAX_MSG + 1];             // String para armazenar a mensagem recebida
+int nbytes, count;                 // Variaveis para armazenar o numero de bytes recebidos e o numero de bytes enviados
+socklen_t size_client;             // Variavel para armazenar o tamanho da estrutura do cliente
 
 /* Função para preparar um socket de receção de pedidos de ligação
  * num determinado porto.
@@ -249,5 +249,6 @@ int network_send(int client_socket, struct message_t *msg)
  */
 int network_server_close(int socket)
 {
+    // Fechar o socket
     return close(sockfd);
 }
