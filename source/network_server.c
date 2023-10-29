@@ -1,11 +1,12 @@
 #include "table.h"
 #include "inet.h"
 #include "sdmessage.pb-c.h"
+#include "network_server.h"
 
 // Informações do socket
 int sockfd;                        // Descritor do socket
 struct sockaddr_in server, client; // Estruturas para armazenar informações do servidor e do cliente
-char str[MAX_MSG + 1];             // String para armazenar a mensagem recebida
+char received_msg[MAX_MSG + 1];    // String para armazenar a mensagem recebida
 int nbytes, count;                 // Variaveis para armazenar o numero de bytes recebidos e o numero de bytes enviados
 socklen_t size_client;             // Variavel para armazenar o tamanho da estrutura do cliente
 
@@ -28,11 +29,12 @@ int network_server_init(short port)
     server.sin_addr.s_addr = htonl(INADDR_ANY);     // Forçar o servidor a aceitar pedidos de qualquer dos seus endereços IP
     // Configurar opções de socket usando a função setsockopt, permitindo que o socket reutilize endereços de porta e endereços
     int enable = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR), (char *)&enable, sizeof(enable)) < 0)
+
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &enable, sizeof(enable)) < 0)
     {
         printf("Erro a configurar o socket!\n");
         close(sockfd);
-        exit(2);
+        return -1;
     }
     // Associar o socket criado com o endereço e o número da porta especificados na estrutura server
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
@@ -61,7 +63,7 @@ int network_server_init(short port)
  * A função não deve retornar, a menos que ocorra algum erro. Nesse
  * caso retorna -1.
  */
-int network_main_loop(int listening_socket)
+int network_main_loop(int listening_socket, struct table_t *table)
 {
     int connsockfd;               // Variavel para armazenar o descritor do socket
     struct message_t *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória

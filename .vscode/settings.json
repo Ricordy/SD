@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "data.h": "c"
+        "data.h": "c",
+        "inet.h": "c",
+        "sdmessage.pb-c.h": "c",
+        "table.h": "c",
+        "network_server.h": "c",
+        "socket.h": "c",
+        "message-private.h": "c"
     }
 }
