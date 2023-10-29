@@ -94,7 +94,8 @@ int invoke(MessageT *msg, struct table_t *table)
         {
             if ((dataReceived = table_get(table, msg->key)) != NULL)
             {
-                msg->value = dataReceived->data;
+                msg->value.data = dataReceived->data;
+                msg->value.len = dataReceived->datasize;
                 data_destroy(dataReceived);
                 return 0;
             }
@@ -138,8 +139,8 @@ int invoke(MessageT *msg, struct table_t *table)
     else if (operacao == MESSAGE_T__OPCODE__OP_GETTABLE)
     {
         // Operação de obtenção de uma entry com chave key
-        msg->opcdode = MESSAGE_T__OPCODE__OP_ERROR;
-        msg->c_type = MESSAGE_T__C_TYPE__CT_NOTe;
+        msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
+        msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
         return -1;
     }
 

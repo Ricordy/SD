@@ -9,8 +9,8 @@ struct table_t *server_table; // Tabela de dados
 void termination_handler(int signum)
 {
     fprintf(stderr, "\nEncerrando o servidor.\n");
-    network_server_close(signum); // Fecha o servidor de rede
-    table_skel_destroy();         // Destrói a tabela
+    network_server_close(signum);     // Fecha o servidor de rede
+    table_skel_destroy(server_table); // Destrói a tabela
     exit(1);
 }
 
