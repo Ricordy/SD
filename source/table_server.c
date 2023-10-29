@@ -3,6 +3,8 @@
 #include "table_skel.h"
 #include "network_server.h"
 
+struct table_t *server_table; // Tabela de dados
+
 // Manipulador para o sinal SIGINT (Ctrl+C)
 void termination_handler(int signum)
 {
@@ -40,19 +42,19 @@ int main(int argc, char **argv)
     }
 
     // Inicializa as tabelas
-    int result = table_skel_init(numero_de_listas);
-    if (result == -1)
+    server_table = table_skel_init(numero_de_listas);
+    if (server_table == -1)
     {
         fprintf(stderr, "Erro ao criar as tabelas!\n");
         return 1; // Saída de erro indicando falha ao criar as tabelas
     }
 
     // Inicia o loop principal de rede
-    result = network_main_loop(socket);
+    server_table = network_main_loop(socket, server_table);
 
     // Fecha o servidor de rede e destrói as tabelas
     network_server_close(socket);
-    table_skel_destroy();
+    table_skel_destroy(server_table);
 
-    return result;
+    return server_table;
 }
