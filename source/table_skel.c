@@ -109,7 +109,9 @@ int invoke(MessageT *msg, struct table_t *table)
         msg->opcode += 1;
         msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
 
-        if ((table_put(table, msg->entry->key, msg->entry->value)) == -1)
+        struct data_t *dataTemp = data_create(msg->value.len, msg->value.data);
+
+        if ((table_put(table, msg->entry->key,dataTemp)) == -1)
         {
             msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
             return -1;
