@@ -6,6 +6,8 @@
         "table.h": "c",
         "network_server.h": "c",
         "socket.h": "c",
-        "message-private.h": "c"
+        "message-private.h": "c",
+        "new": "c",
+        "type_traits": "c"
     }
 }

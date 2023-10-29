@@ -15,15 +15,15 @@ int network_connect(struct rtable_t *rtable)
 {
     printf("Entri no problema \n");
     // verificar se rtable é NULL
-    if (rtable->server_address == NULL || rtable->server_address == NULL || rtable->sockfd == NULL)
+    if (rtable->server_address == NULL || rtable->server_address == NULL)
     {
         fprintf(stderr, "rtable vazio.\n");
         return -1;
     }
 
     // informações do servidor
-    rtable->socket.sin_family = AF_INET; // Definiar Address Family (IPV4)
-    rtable->socket.sin_port = htons(rtable->server_port); // Converter para network byte order (big-endian)
+    rtable->socket.sin_family = AF_INET;                                          // Definiar Address Family (IPV4)
+    rtable->socket.sin_port = htons(rtable->server_port);                         // Converter para network byte order (big-endian)
     if (inet_pton(AF_INET, rtable->server_address, &rtable->socket.sin_addr) < 1) // Transformação em binario
     {
         perror("Erro ao converter o endereço IP \n");

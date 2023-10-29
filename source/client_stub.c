@@ -321,7 +321,7 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable)
         return NULL;
     }
     // Libertar memoria reservada e retornar as keys pedidas
-    struct entry_t **entries = mensagem->msgConvert->entries;
+    struct entry_t **entries = (struct entry_t **)mensagem->msgConvert->entries;
     mensagem->msgConvert->entries = NULL;
     message_t__free_unpacked(mensagem->msgConvert, NULL);
     free(mensagemConvert);

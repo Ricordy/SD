@@ -65,8 +65,8 @@ int network_server_init(short port)
  */
 int network_main_loop(int listening_socket, struct table_t *table)
 {
-    int connsockfd;               // Variavel para armazenar o descritor do socket
-    struct message_t *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
+    int connsockfd;       // Variavel para armazenar o descritor do socket
+    MessageT *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
 
     while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
     {
@@ -82,29 +82,26 @@ int network_main_loop(int listening_socket, struct table_t *table)
             msg = network_receive(connsockfd); // Receber a mensagem do cliente
             if (msg == NULL)                   // Verificação da mensagem
             {
-                message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
-                free(msg->msgConvert);                           // Libertar a mensagem recebida
-                free(msg);                                       // Libertar a estrutura de mensagem
-                close(connsockfd);                               // Fechar a conexão com o cliente
+                message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
+                free(msg);                           // Libertar a mensagem recebida
+                close(connsockfd);                   // Fechar a conexão com o cliente
                 printf("Erro a receber mensagem!\n");
                 break; // Sair do loop
             }
             int inv = invoke(msg); // Executar a operação enviada pelo cliente
             if (inv == -1)
             {
-                message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
-                free(msg->msgConvert);                           // Libertar a mensagem recebida
-                free(msg);                                       // Libertar a estrutura de mensagem
-                close(connsockfd);                               // Fechar a conexão com o cliente
+                message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
+                free(msg);                           // Libertar a mensagem recebida
+                close(connsockfd);                   // Fechar a conexão com o cliente
                 printf("Erro invoke!\n");
                 break; // Saia do loop interno em caso de erro
             }
             if (network_send(connsockfd, msg) == -1)
             {
-                message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
-                free(msg->msgConvert);                           // Libertar a mensagem recebida
-                free(msg);                                       // Libertar a estrutura de mensagem
-                close(connsockfd);                               // Fechar a conexão com o cliente
+                message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
+                free(msg);                           // Libertar a estrutura de mensagem
+                close(connsockfd);                   // Fechar a conexão com o cliente
                 printf("Erro a enviar mensagem!\n");
                 break; // Saia do loop interno em caso de erro
             }
@@ -118,9 +115,8 @@ int network_main_loop(int listening_socket, struct table_t *table)
     // Libertar recursos após o cliclo
     if (msg != NULL)
     {
-        message_t__free_unpacked(msg->msgConvert, NULL); // Libertar a mensagem recebida
-        free(msg->msgConvert);                           // Libertar a mensagem recebida
-        free(msg);                                       // Libertar a estrutura de mensagem
+        message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
+        free(msg);                           // Libertar a estrutura de mensagem
     }
     close(connsockfd); // Fechar a conexão com o cliente
     return 0;
@@ -170,7 +166,7 @@ MessageT *network_receive(int client_socket)
     }
 
     // Aloca rmemória para a estrutura da mensagem
-    struct message_t *msgRecebida = (struct message_t *)malloc(sizeof(struct message_t));
+    MessageT *msgRecebida = (MessageT *)malloc(sizeof(MessageT));
     if (msgRecebida == NULL)
     {
         free(buf);
@@ -179,11 +175,11 @@ MessageT *network_receive(int client_socket)
     }
 
     // Deserializa a mensagem
-    msgRecebida->msgConvert = (struct _MessageT *)message_t__unpack(NULL, size, buf);
+    msgRecebida = (struct _MessageT *)message_t__unpack(NULL, size, buf);
     free(buf);
 
     // Verifica se a deserialização foi bem-sucedida
-    if (msgRecebida->msgConvert == NULL)
+    if (msgRecebida == NULL)
     {
         free(msgRecebida);
         perror("Erro ao deserializar a mensagem");
@@ -219,7 +215,7 @@ int network_send(int client_socket, MessageT *msg)
 
     // Enviar o tamanho do buffer
     int sizeEnviado;
-    if (sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(int)) != sizeof(int))
+    if ((sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(int)) != sizeof(int)))
     {
         perror("Erro ao enviar tamanho do buffer ao servidor");
         close(client_socket);
@@ -233,7 +229,7 @@ int network_send(int client_socket, MessageT *msg)
 
     // Enviar o buffer
     int nbytes;
-    if (nbytes = write_all(client_socket, buf, len) != len)
+    if ((nbytes = write_all(client_socket, buf, len) != len))
     {
         perror("Erro ao enviar dados ao servidor");
         close(client_socket);
