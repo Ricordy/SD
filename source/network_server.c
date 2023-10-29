@@ -1,6 +1,6 @@
 #include "table.h"
 #include "inet.h"
-#include "sdmessage.pb-c.h"
+#include "message-private.h"
 #include "network_server.h"
 
 // Informações do socket
@@ -132,7 +132,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
  *   reservando a memória necessária para a estrutura MessageT.
  * Retorna a mensagem com o pedido ou NULL em caso de erro.
  */
-struct message_t *network_receive(int client_socket)
+MessageT *network_receive(int client_socket)
 {
     int size; // Variavel de apoio para armazenar tmnh da mensagem
 
@@ -199,12 +199,12 @@ struct message_t *network_receive(int client_socket)
  * - Enviar a mensagem serializada, através do client_socket.
  * Retorna 0 (OK) ou -1 em caso de erro.
  */
-int network_send(int client_socket, struct message_t *msg)
+int network_send(int client_socket, MessageT *msg)
 {
     // Serializar a mensagem
     unsigned len;
     uint8_t *buf = NULL;
-    len = message_t__get_packed_size(msg->msgConvert);
+    len = message_t__get_packed_size(msg);
     buf = malloc(len);
     if (buf == NULL)
     {
@@ -212,14 +212,15 @@ int network_send(int client_socket, struct message_t *msg)
     }
 
     // Empacotar a mensagem na estrutura de dados
-    message_t__pack(msg->msgConvert, buf);
+    message_t__pack(msg, buf);
 
     // Converter o tamanho da mensagem para a ordem de bytes da rede
     int sizeEnviar = htonl(len);
 
     // Enviar o tamanho do buffer
     int sizeEnviado;
-    if ((sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(int)) != sizeof(int)) {
+    if (sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(int)) != sizeof(int))
+    {
         perror("Erro ao enviar tamanho do buffer ao servidor");
         close(client_socket);
         free(buf);
@@ -227,12 +228,13 @@ int network_send(int client_socket, struct message_t *msg)
     }
 
     // Libetar a memória ocupada pela mensagem
-    message_t__free_unpacked(msg->msgConvert, NULL);
+    message_t__free_unpacked(msg, NULL);
     free(msg);
 
-    //Enviar o buffer
+    // Enviar o buffer
     int nbytes;
-    if ((nbytes = write_all(client_socket, buf, len) != len) {
+    if (nbytes = write_all(client_socket, buf, len) != len)
+    {
         perror("Erro ao enviar dados ao servidor");
         close(client_socket);
         free(buf);

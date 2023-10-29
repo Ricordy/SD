@@ -7,7 +7,7 @@ BIN = binary
 
 EXECUTABLES = table_client 
 
-out: sdmessage message.o client_stub.o network_client.o table_client.o sdmessage.o $(EXECUTABLES)
+out: sdmessage message.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o $(EXECUTABLES)
 
 
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o
@@ -36,7 +36,7 @@ table_client.o: $(SRC)/table_client.c $(INCLUDE)/client_stub.h  $(INCLUDE)/netwo
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
-network_server.o: $(SRC)/network_server.c $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h
+network_server.o: $(SRC)/network_server.c $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 message.o: $(SRC)/message.c $(INCLUDE)/message-private.h 
