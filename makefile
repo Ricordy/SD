@@ -5,12 +5,15 @@ INCLUDE = include
 OBJ = object
 BIN = binary
 
-EXECUTABLES = table_client 
+EXECUTABLES = table_client table_server
 
-out: sdmessage message.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o $(EXECUTABLES)
+out: sdmessage message.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_skel.o table_server.o $(EXECUTABLES)
 
 
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o
+	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
+
+table_server: $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/network_server.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
 
 data.o: $(SRC)/data.c $(INCLUDE)/data.h
@@ -31,6 +34,12 @@ client_stub.o: $(SRC)/client_stub.c $(INCLUDE)/client_stub.h  $(INCLUDE)/data.h 
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 table_client.o: $(SRC)/table_client.c $(INCLUDE)/client_stub.h  $(INCLUDE)/network_client.h   $(INCLUDE)/client_stub-private.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+
+table_server.o: $(SRC)/table_server.c $(INCLUDE)/table_skel.h  $(INCLUDE)/network_server.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+
+table_skel.o: $(SRC)/table_skel.c $(INCLUDE)/table_skel.h  $(INCLUDE)/sdmessage.pb-c.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 

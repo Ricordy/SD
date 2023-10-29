@@ -25,7 +25,7 @@ struct rtable_t *rtable_connect(char *address_port)
             tcp_table->server_port = atoi(address_port + i + 1);                     // Converter a string relativa ao porto
             tcp_table->server_address = malloc(sizeof(char) * (i + 1));              // Reservar o espaço necessário para o ip do servidor
             memcpy(tcp_table->server_address, address_port, sizeof(char) * (i + 1)); // copiar o valor do ip para a o endereço da memoria que definimos anteriormente
-            ((char *)tcp_table->server_address)[i] = '\0';
+            ((char *)tcp_table->server_address)[i] = '\0';                           // Colocar o caracter de fim de string
         }
     }
     tcp_table->sockfd = socket(AF_INET, SOCK_STREAM, 0);                                              // Criação do socket para comunicação
@@ -198,16 +198,19 @@ int rtable_del(struct rtable_t *rtable, char *key)
  */
 int rtable_size(struct rtable_t *rtable)
 {
+    printf("A obter o tamanho da tabela...\n");
     struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
 
     if (mensagem == NULL) // Verificação da alocação de espaço
     {
+        printf("Erro a obter numero de elementos da tabela\n");
         return -1;
     }
 
     struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
     if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
     {
+        printf("Erro a obter numero de elementos da tabela\n");
         return -1;
     }
     message_t__init(mensagemConvert);                          // Inicialização da variavel de apoio
@@ -215,6 +218,7 @@ int rtable_size(struct rtable_t *rtable)
     mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_SIZE; // Colocar o opcode da operação
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE; // Colocar o tipo de dados enviados no caso nenhum
 
+    printf("Mensagem carregado pronto a enviar ...\n");
     // Enviar o pedido para o servidor e processar a resposta
     mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)

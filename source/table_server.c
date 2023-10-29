@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <signal.h>
 #include "inet.h"
 #include "table_skel.h"

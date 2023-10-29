@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     // Iniciar cliente
     struct rtable_t *rtable = rtable_connect(argv[1]); // Definição da variavel de comunicação
-    if (rtable == NULL) // Verificar a conexão
+    if (rtable == NULL)                                // Verificar a conexão
     {
         exit(1);
     }
@@ -66,7 +66,9 @@ int main(int argc, char **argv)
             }
             else if ((strcmp(operacao, "size") == 0)) // Comando SIZE
             {
+                printf("A obter o tamanho da tabela...  %d\n", rtable->sockfd);
                 int tamanho = rtable_size(rtable);
+                printf("Tamanho -> %d\n", tamanho);
                 printf("Tamanho -> %d\n", tamanho);
             }
             else if (strcmp(operacao, "del") == 0) // Comando DEL
