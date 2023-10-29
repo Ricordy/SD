@@ -94,7 +94,8 @@ int invoke(MessageT *msg, struct table_t *table)
         {
             if ((dataReceived = table_get(table, msg->key)) != NULL)
             {
-                msg->value = dataReceived->data;
+                msg->value.data = dataReceived->data;
+                msg->value.len = dataReceived->datasize;
                 data_destroy(dataReceived);
                 return 0;
             }
