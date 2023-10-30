@@ -15,6 +15,7 @@ struct table_t *table_skel_init(int n_lists)
     if (server_table == NULL)
     {
         fprintf(stderr, "Erro na inicialização da tabela.\n");
+        return NULL;
     }
     return server_table; // Retorna a tabela criada ou NULL em caso de erro
 }
@@ -112,7 +113,7 @@ int invoke(MessageT *msg, struct table_t *table)
 
         struct data_t *dataTemp = data_create(msg->value.len, msg->value.data);
 
-        if ((table_put(table, msg->entry->key,dataTemp)) == -1)
+        if ((table_put(table, msg->entry->key, dataTemp)) == -1)
         {
             msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
             return -1;

@@ -2,6 +2,7 @@
 #include "inet.h"
 #include "message-private.h"
 #include "network_server.h"
+#include "table_skel.h"
 
 // Informações do socket
 int sockfd;                        // Descritor do socket
@@ -88,7 +89,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
                 printf("Erro a receber mensagem!\n");
                 break; // Sair do loop
             }
-            int inv = invoke(msg); // Executar a operação enviada pelo cliente
+            int inv = invoke(msg, table); // Executar a operação enviada pelo cliente
             if (inv == -1)
             {
                 message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida

@@ -43,18 +43,18 @@ int main(int argc, char **argv)
 
     // Inicializa as tabelas
     server_table = table_skel_init(numero_de_listas);
-    if (server_table == -1)
+    if (server_table == NULL)
     {
         fprintf(stderr, "Erro ao criar as tabelas!\n");
         return 1; // Saída de erro indicando falha ao criar as tabelas
     }
 
     // Inicia o loop principal de rede
-    server_table = network_main_loop(socket, server_table);
+    int status = network_main_loop(socket, server_table);
 
     // Fecha o servidor de rede e destrói as tabelas
     network_server_close(socket);
     table_skel_destroy(server_table);
 
-    return server_table;
+    return status;
 }

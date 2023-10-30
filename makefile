@@ -2,25 +2,41 @@ CFLAGS = -Wall -I include -g
 CC = gcc
 SRC = source
 INCLUDE = include
-OBJ = object
+OBJ = object/general
+OBJS = object/professor
 BIN = binary
+LIB = lib
 
 EXECUTABLES = table_client table_server
 
-out: sdmessage message.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_server.o table_skel.o $(EXECUTABLES)
+LIBTABLE_OBJS = $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o
 
 
-table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o
+out: sdmessage libtable message.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_server.o table_skel.o $(EXECUTABLES)
+
+
+table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
 
-table_server: $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/network_server.o $(OBJ)/data.o $(OBJ)/entry.o $(OBJ)/list.o $(OBJ)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o
+table_server: $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/network_server.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
+
+libtable: $(LIB)/libtable.a
+
+$(LIB)/libtable.a: $(LIBTABLE_OBJS)
+	ar rcs $@ $^
 
 data.o: $(SRC)/data.c $(INCLUDE)/data.h
-	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+	$(CC) -c $(CFLAGS) $< -o $(OBJS)/$@
 
 entry.o: $(SRC)/entry.c $(INCLUDE)/data.h $(INCLUDE)/entry.h
-	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+	$(CC) -c $(CFLAGS) $< -o $(OBJS)/$@
+
+list.o: $(SRC)/list.c $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/list.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJS)/$@
+
+table.o: $(SRC)/table.c $(INCLUDE)/data.h $(INCLUDE)/entry.h $(INCLUDE)/table.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJS)/$@
 
 sdmessage.o: $(SRC)/sdmessage.pb-c.c $(INCLUDE)/sdmessage.pb-c.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
@@ -55,4 +71,6 @@ clean:
 	rm -f $(OBJ)/*
 	rm -f $(SRC)/sdmessage.pb-c.c
 	rm -f $(INCLUDE)/sdmessage.pb-c.h
+	rm -f $(BIN)/*
+	rm -f $(LIB)/*
 	

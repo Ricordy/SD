@@ -13,9 +13,8 @@
  */
 int network_connect(struct rtable_t *rtable)
 {
-    printf("Entri no problema \n");
     // verificar se rtable é NULL
-    if (rtable->server_address == NULL || rtable->server_port == NULL)
+    if (rtable->server_address == NULL || rtable->server_port == 0)
     {
         fprintf(stderr, "rtable vazio.\n");
         return -1;
@@ -39,6 +38,8 @@ int network_connect(struct rtable_t *rtable)
         return -1;
     }
 
+    printf("Conectado ao servidor\n");
+
     return 0;
 }
 
@@ -55,7 +56,6 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 {
 
     int client_socket = rtable->sockfd;
-    printf("Netwrok Send/Recieve: client_socket: %d\n", client_socket);
     // Verificar se socket é válido
     if (client_socket == -1)
     {
@@ -63,14 +63,10 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         return NULL;
     }
 
-    printf("Netwrok Send/Recieve: pre serialização\n");
-
     // Serializar a mensagem
     size_t message_len = message_t__get_packed_size(msg);
     uint8_t *message_buffer = (uint8_t *)malloc(message_len);
     message_t__pack(msg, message_buffer);
-
-    printf("Netwrok Send/Recieve: pre envio tamanho %d\n", client_socket);
     // Tamanho da mensagem
     uint16_t message_size = (uint16_t)message_len;
     if (write_all(client_socket, &message_size, sizeof(uint16_t)) == -1)
@@ -79,7 +75,6 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         free(message_buffer);
         return NULL;
     }
-    printf("Netwrok Send/Recieve: pre envio mensagem %d\n", client_socket);
     // Mensagem serializada
     if (write_all(client_socket, message_buffer, message_len) == -1)
     {
@@ -87,16 +82,14 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         free(message_buffer);
         return NULL;
     }
-    printf("Netwrok Send/Recieve: pre receção tamanho %d\n", client_socket);
     // Receção tamanho resposta
-    uint16_t response_size = (uint16_t)message_len;
+    uint16_t response_size = (uint16_t)response_size;
     if (read_all(client_socket, &response_size, sizeof(uint16_t)) == -1)
     {
         perror("Erro ao receber o tamanho da resposta");
         free(message_buffer);
         return NULL;
     }
-    printf("Netwrok Send/Recieve: pre receção resposta\n");
     // Receção resposta
     uint8_t *response_buffer = (uint8_t *)malloc(response_size);
     if (read_all(client_socket, response_buffer, response_size) == -1)
@@ -106,8 +99,6 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         free(response_buffer);
         return NULL;
     }
-
-    printf("Netwrok Send/Recieve: pre deserialização\n");
     // De-serialização da resposta
     MessageT *response = message_t__unpack(NULL, response_size, response_buffer);
 

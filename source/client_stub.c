@@ -198,7 +198,6 @@ int rtable_del(struct rtable_t *rtable, char *key)
  */
 int rtable_size(struct rtable_t *rtable)
 {
-    printf("A obter o tamanho da tabela...\n");
     struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
 
     if (mensagem == NULL) // Verificação da alocação de espaço
@@ -217,8 +216,6 @@ int rtable_size(struct rtable_t *rtable)
     mensagem->msgConvert = mensagemConvert;                    // Colocar a variavel de apoio na variavel de comunicação com o socket
     mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_SIZE; // Colocar o opcode da operação
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE; // Colocar o tipo de dados enviados no caso nenhum
-
-    printf("Mensagem carregado pronto a enviar ...\n");
     // Enviar o pedido para o servidor e processar a resposta
     mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
