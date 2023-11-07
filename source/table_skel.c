@@ -55,8 +55,8 @@ int invoke(MessageT *msg, struct table_t *table)
         // Operação do tamanho da tabela
         if (table_size(table) == -1)
         {
-            msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
-            msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
+            // msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
+            // msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
             return -1;
         }
         msg->opcode += 1;

@@ -64,7 +64,7 @@ network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h
 network_server.o: $(SRC)/network_server.c $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
-message.o: $(SRC)/message.c $(INCLUDE)/message-private.h 
+message.o: $(SRC)/message.c $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 clean:
