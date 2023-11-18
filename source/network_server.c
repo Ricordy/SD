@@ -74,7 +74,7 @@ int network_server_init(short port)
 
 void *handle_client(void *arg, struct table_t *table)
 {
-    int connsockfd = *((int *)arg);
+    int connsockfd = *((int *)arg->args);
     MessageT *msg = NULL;
 
     pthread_mutex_lock(&server_stats.stats_mutex);
@@ -166,6 +166,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
                 printf("Erro invoke!\n");
                 break; // Saia do loop interno em caso de erro
             }
+            
             if (network_send(connsockfd, msg) == -1)
             {
                 // message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
@@ -174,12 +175,10 @@ int network_main_loop(int listening_socket, struct table_t *table)
                 printf("Erro a enviar mensagem!\n");
                 break; // Saia do loop interno em caso de erro
             }
-
-            pthread_mutex_destroy(&server_stats.stats_mutex);
             else
             {
                 printf("Mensagem enviada!\n");
-            }
+            }        
         }
     }
 
