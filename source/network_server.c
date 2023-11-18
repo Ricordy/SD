@@ -4,12 +4,24 @@
 #include "network_server.h"
 #include "table_skel.h"
 
+struct statistics_t
+{
+    int total_operations;
+    long total_time;
+    int connected_clients;
+    pthread_mutex_t stats_mutex;
+};
+
 // Informações do socket
 int sockfd;                        // Descritor do socket
 struct sockaddr_in server, client; // Estruturas para armazenar informações do servidor e do cliente
 char received_msg[MAX_MSG + 1];    // String para armazenar a mensagem recebida
 int nbytes, count;                 // Variaveis para armazenar o numero de bytes recebidos e o numero de bytes enviados
 socklen_t size_client;             // Variavel para armazenar o tamanho da estrutura do cliente
+
+struct statistics_t server_stats; // Estatísticas globais do servidor
+
+pthread_mutex_t table_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex para proteger o acesso à tabela
 
 /* Função para preparar um socket de receção de pedidos de ligação
  * num determinado porto.
@@ -54,6 +66,43 @@ int network_server_init(short port)
     return sockfd;
 }
 
+void *handle_client(void *arg)
+{
+    int connsockfd = *((int *)arg);
+    MessageT *msg = NULL;
+
+    pthread_mutex_lock(&server_stats.stats_mutex);
+    server_stats.connected_clients++;
+    pthread_mutex_unlock(&server_stats.stats_mutex);
+
+    while (1)
+    {
+        msg = network_receive(connsockfd);
+        if (msg == NULL)
+        {
+            close(connsockfd);
+            break;
+        }
+
+        // Executa a operação enviada pelo cliente
+        pthread_mutex_lock(&table_mutex);
+        int inv = invoke(msg, table);
+        pthread_mutex_unlock(&table_mutex);
+
+        if (inv == -1 || network_send(connsockfd, msg) == -1)
+        {
+            close(connsockfd);
+            break;
+        }
+    }
+
+    pthread_mutex_lock(&server_stats.stats_mutex);
+    server_stats.connected_clients--;
+    pthread_mutex_unlock(&server_stats.stats_mutex);
+
+    pthread_exit(NULL);
+}
+
 /* A função network_main_loop() deve:
  * - Aceitar uma conexão de um cliente;
  * - Receber uma mensagem usando a função network_receive;
@@ -77,6 +126,9 @@ int network_main_loop(int listening_socket, struct table_t *table)
             perror("Error no accept!\n");
             return -1;
         }
+
+        pthread_t thread_id;
+        pthread_create(&thread_id, NULL, handle_client, (void *)&connsockfd);
 
         while (1) // Lidar com a conexão do cliente após esta ser aceite
         {
@@ -106,6 +158,8 @@ int network_main_loop(int listening_socket, struct table_t *table)
                 printf("Erro a enviar mensagem!\n");
                 break; // Saia do loop interno em caso de erro
             }
+
+            pthread_mutex_destroy(&server_stats.stats_mutex);
             else
             {
                 printf("Mensagem enviada!\n");
@@ -213,7 +267,7 @@ int network_send(int client_socket, MessageT *msg)
 
     // Converter o tamanho da mensagem para a ordem de bytes da rede
     int sizeEnviar = htons(len);
-
+    printf("Before Enviar o tamanho do buffer\n");
     // Enviar o tamanho do buffer
     int sizeEnviado;
     if ((sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(short)) != sizeof(short)))
@@ -223,11 +277,15 @@ int network_send(int client_socket, MessageT *msg)
         free(buf);
         return -1; // Retorna -1 em caso de erro no envio do tamanho do buffer
     }
+    printf("After Enviar o tamanho do buffer\n");
 
+    printf("Before message_t_free\n");
     // Libetar a memória ocupada pela mensagem
     message_t__free_unpacked(msg, NULL);
     // free(msg);
+    printf("After message_t_free\n");
 
+    printf("Before Enviar o buffer\n");
     // Enviar o buffer
     int nbytes;
     if ((nbytes = write_all(client_socket, buf, len) != len))
@@ -237,6 +295,7 @@ int network_send(int client_socket, MessageT *msg)
         free(buf);
         return -1; // Retorna -1 em caso de erro no envio do buffer
     }
+    printf("After Enviar o buffern");
 
     // Libetar a memoria do buffer
     free(buf);
