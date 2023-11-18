@@ -27,8 +27,10 @@ int read_all(int socket, void *buffer, int size)
 {
     int sizeBuffer = size; // Guardar tamanho do buffer a ser retornado
     int index;             // Variavel de apoio
+    int* tmp = malloc(sizeof(uint32_t))
     while (size > 0)       // Ciclo de leitura no socket
     {
+        
         index = read(socket, buffer, size);
         // Verificar o resultado da operação de leitura
         if (index < 0)

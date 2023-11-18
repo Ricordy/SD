@@ -143,7 +143,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
         }
 
         argumentos->args = connsockfd;
-        argumentos->tabela = table
+        argumentos->tabela = table;
 
         pthread_t thread_id;
         pthread_create(&thread_id, NULL, handle_client, (void *)&argumentos);
@@ -202,10 +202,10 @@ int network_main_loop(int listening_socket, struct table_t *table)
  */
 MessageT *network_receive(int client_socket)
 {
-    short size; // Variavel de apoio para armazenar tmnh da mensagem
+    uint32_t size; // Variavel de apoio para armazenar tmnh da mensagem
 
     // Receber o tamanho da mensagem
-    if (read_all(client_socket, &size, sizeof(short)) <= 0)
+    if (read_all(client_socket, &size, sizeof(uint32_t)) <= 0)
     {
         printf("Erro a receber!\n");
         return NULL;
