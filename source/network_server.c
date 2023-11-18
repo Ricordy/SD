@@ -3,6 +3,7 @@
 #include "message-private.h"
 #include "network_server.h"
 #include "table_skel.h"
+#include <pthread.h>
 
 struct statistics_t
 {
@@ -10,6 +11,11 @@ struct statistics_t
     long total_time;
     int connected_clients;
     pthread_mutex_t stats_mutex;
+};
+
+struct u_args {
+    int args;
+    struct table_t *tabela;  // Substitua 'table_t' pelo tipo real da sua tabela
 };
 
 // Informações do socket
@@ -66,7 +72,7 @@ int network_server_init(short port)
     return sockfd;
 }
 
-void *handle_client(void *arg)
+void *handle_client(void *arg, struct table_t *table)
 {
     int connsockfd = *((int *)arg);
     MessageT *msg = NULL;
@@ -127,8 +133,18 @@ int network_main_loop(int listening_socket, struct table_t *table)
             return -1;
         }
 
+        // Criação de uma estrutura para armazenar os argumentos
+        struct u_args *argumentos = (struct u_args *)malloc(sizeof(struct u_args));
+        if (argumentos == NULL) {
+            fprintf(stderr, "Erro ao alocar memória para argumentos\n");
+            return -1;
+        }
+
+        argumentos->args = connsockfd;
+        argumentos->tabela = table
+
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, handle_client, (void *)&connsockfd);
+        pthread_create(&thread_id, NULL, handle_client, (void *)&argumentos);
 
         while (1) // Lidar com a conexão do cliente após esta ser aceite
         {
