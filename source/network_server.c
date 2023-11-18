@@ -236,7 +236,7 @@ MessageT *network_receive(int client_socket)
     // Verifica se a deserialização foi bem-sucedida
     if (msgRecebida == NULL)
     {
-        
+
         perror("Erro ao deserializar a mensagem");
         return NULL;
     }
