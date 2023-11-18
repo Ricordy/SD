@@ -72,9 +72,11 @@ int network_server_init(short port)
     return sockfd;
 }
 
-void *handle_client(void *arg, struct table_t *table)
+void *handle_client(void *arg)
 {
-    int connsockfd = *((int *)arg->args);
+    struct u_args *args = arg;
+    int connsockfd = args->args;
+    struct table_t *table = args->tabela;
     MessageT *msg = NULL;
 
     pthread_mutex_lock(&server_stats.stats_mutex);
