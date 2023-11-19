@@ -125,8 +125,9 @@ int network_main_loop(int listening_socket, struct table_t *table)
 {
     int connsockfd;       // Variavel para armazenar o descritor do socket
     MessageT *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
+    //accept(listening_socket, (struct sockaddr *)&client, &size_client)
 
-    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
+    while ((connsockfd = accept(listening_socket, NULL, 0)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
     {
         printf("Recebeu cliente!\n");
         if (connsockfd == -1) // Verificação do socket recebido pela função accept
@@ -212,7 +213,7 @@ MessageT *network_receive(int client_socket)
     // Receber o tamanho da mensagem
     if (read_all(client_socket, &size, sizeof(short)) <= 0)
     {
-        printf("Erro a receber!\n");
+        printf("Erro a receber o tamanho da mensagem!\n");
         return NULL;
     }
 

@@ -34,7 +34,7 @@ int read_all(int socket, void *buffer, int size)
         // Verificar o resultado da operação de leitura
         if (index < 0)
         {
-            perror("Erro na leitura!"); // Mensagem de erro
+            perror("Erro na leitura no read_all!"); // Mensagem de erro
             return index;               // Retornar o index do erro para verificar na função chamadora o sucesso da chamada a esta função
         }
         size -= index;
