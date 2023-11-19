@@ -121,7 +121,7 @@ void *handle_client(void *arg)
 /* A função network_main_loop() deve:
  * - Aceitar uma conexão de um cliente;
  * - Receber uma mensagem usando a função network_receive;
- * - Entregar a mensagem de-serializada ao skeleton para ser processada
+ * - Entregar a mensahandle_clientgem de-serializada ao skeleton para ser processada
      na tabela table;
  * - Esperar a resposta do skeleton;
  * - Enviar a resposta ao cliente usando a função network_send.
@@ -133,8 +133,9 @@ int network_main_loop(int listening_socket, struct table_t *table)
     int connsockfd;       // Variavel para armazenar o descritor do socket
     MessageT *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
     // accept(listening_socket, (struct sockaddr *)&client, &size_client)
+    // accept(listening_socket, NULL, 0))
 
-    while ((connsockfd = accept(listening_socket, NULL, 0)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
+    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
     {
         printf("Recebeu cliente no mainloop!\n");
         if (connsockfd == -1) // Verificação do socket recebido pela função accept
@@ -148,7 +149,8 @@ int network_main_loop(int listening_socket, struct table_t *table)
         if (argumentos == NULL)
         {
             fprintf(stderr, "Erro ao alocar memória para argumentos\n");
-            return -1;
+            continue;
+            // return -1;
         }
 
         argumentos->args = connsockfd;
@@ -220,6 +222,7 @@ MessageT *network_receive(int client_socket)
     short size; // Variavel de apoio para armazenar tmnh da mensagem
 
     // Receber o tamanho da mensagem
+    printf("Before Receber o tamanho da mensagem no network recieve\n");
     if (read_all(client_socket, &size, sizeof(short)) <= 0)
     {
         printf("Erro a receber o tamanho da mensagem!\n");
@@ -228,7 +231,7 @@ MessageT *network_receive(int client_socket)
 
     // Converter o tamanho de rede de ordem de bytes da network para a ordem de bytes do host
     size = ntohs(size);
-
+    printf("After Receber o tamanho da mensagem no network recieve\n");
     // Verificar se o tamanho da mensagem é válido
     if (size <= 0)
     {
@@ -236,6 +239,7 @@ MessageT *network_receive(int client_socket)
         return NULL;
     }
 
+    printf("Before Alocar memória para o buffer da mensagem\n");
     // Alocar memória para o buffer da mensagem
     uint8_t *buf = (uint8_t *)malloc(size);
     if (buf == NULL)
@@ -243,11 +247,11 @@ MessageT *network_receive(int client_socket)
         perror("Erro ao alocar memória para a mensagem recebida");
         return NULL;
     }
-
+    printf("After Alocar memória para o buffer da mensagem\n");
     // Receber a mensagem recorrendo ao read_all
     if (read_all(client_socket, buf, size) != size)
     {
-        free(buf);
+        // free(buf);
         perror("Erro ao receber dados do servidor");
         return NULL;
     }

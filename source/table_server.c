@@ -52,11 +52,11 @@ int main(int argc, char **argv)
     // Inicia o loop principal de rede
     printf("Iniciar network_main_loop!\n");
     int status = network_main_loop(socket, server_table);
-    printf("Fecho de network_main_loop\n");
-    // Fecha o servidor de rede e destrói as tabelas
-    network_server_close(socket);
-    table_skel_destroy(server_table);
-    printf("Fechado network_server e table_skel_destroy\n");
+    // printf("Fecho de network_main_loop\n");
+    // // Fecha o servidor de rede e destrói as tabelas
+    // network_server_close(socket);
+    // table_skel_destroy(server_table);
+    // printf("Fechado network_server e table_skel_destroy\n");
 
     return status;
 }
