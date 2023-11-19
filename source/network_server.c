@@ -13,9 +13,10 @@ struct statistics_t
     pthread_mutex_t stats_mutex;
 };
 
-struct u_args {
+struct u_args
+{
     int args;
-    struct table_t *tabela;  // Substitua 'table_t' pelo tipo real da sua tabela
+    struct table_t *tabela; // Substitua 'table_t' pelo tipo real da sua tabela
 };
 
 // Informações do socket
@@ -79,15 +80,21 @@ void *handle_client(void *arg)
     struct table_t *table = args->tabela;
     MessageT *msg = NULL;
 
+    printf("Lidar com o cliente!\n");
+    printf("Args: %d\n", connsockfd);
+
     pthread_mutex_lock(&server_stats.stats_mutex);
     server_stats.connected_clients++;
     pthread_mutex_unlock(&server_stats.stats_mutex);
 
     while (1)
     {
+        printf("Network_receive no handle_client\n");
         msg = network_receive(connsockfd);
+        printf("Depois do network_receive no handle_client\n");
         if (msg == NULL)
         {
+            printf("Entrou no msg == NULL, no handle_client");
             close(connsockfd);
             break;
         }
@@ -125,11 +132,11 @@ int network_main_loop(int listening_socket, struct table_t *table)
 {
     int connsockfd;       // Variavel para armazenar o descritor do socket
     MessageT *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
-    //accept(listening_socket, (struct sockaddr *)&client, &size_client)
+    // accept(listening_socket, (struct sockaddr *)&client, &size_client)
 
     while ((connsockfd = accept(listening_socket, NULL, 0)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
     {
-        printf("Recebeu cliente!\n");
+        printf("Recebeu cliente no mainloop!\n");
         if (connsockfd == -1) // Verificação do socket recebido pela função accept
         {
             perror("Error no accept!\n");
@@ -138,7 +145,8 @@ int network_main_loop(int listening_socket, struct table_t *table)
 
         // Criação de uma estrutura para armazenar os argumentos
         struct u_args *argumentos = (struct u_args *)malloc(sizeof(struct u_args));
-        if (argumentos == NULL) {
+        if (argumentos == NULL)
+        {
             fprintf(stderr, "Erro ao alocar memória para argumentos\n");
             return -1;
         }
@@ -146,8 +154,10 @@ int network_main_loop(int listening_socket, struct table_t *table)
         argumentos->args = connsockfd;
         argumentos->tabela = table;
 
+        printf("Antes do pthread_create\n");
+        printf("Args: %d\n", argumentos->args);
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, handle_client, (void *)&argumentos);
+        pthread_create(&thread_id, NULL, handle_client, (void *)argumentos);
 
         while (1) // Lidar com a conexão do cliente após esta ser aceite
         {
@@ -158,7 +168,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
                 printf("Entrou no msg == NULL, no network_main_loop");
                 // message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
                 // free(msg);                           // Libertar a mensagem recebida
-                close(connsockfd); // Fechar a conexão com o cliente
+                // close(connsockfd); // Fechar a conexão com o cliente
                 printf("Erro a receber mensagem!\n");
                 break; // Sair do loop
             }
@@ -169,24 +179,23 @@ int network_main_loop(int listening_socket, struct table_t *table)
             {
                 message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
                 // free(msg);                           // Libertar a mensagem recebida
-                close(connsockfd); // Fechar a conexão com o cliente
+                // close(connsockfd); // Fechar a conexão com o cliente
                 printf("Erro invoke!\n");
                 break; // Saia do loop interno em caso de erro
             }
-            
+
             if (network_send(connsockfd, msg) == -1)
             {
                 // message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
                 // free(msg);                           // Libertar a estrutura de mensagem
-                close(connsockfd); // Fechar a conexão com o cliente
+                // close(connsockfd); // Fechar a conexão com o cliente
                 printf("Erro a enviar mensagem!\n");
                 break; // Saia do loop interno em caso de erro
             }
             else
             {
                 printf("Mensagem enviada!\n");
-                close(connsockfd);
-            }        
+            }
         }
     }
 
