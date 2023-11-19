@@ -150,6 +150,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
 
         while (1) // Lidar com a conexão do cliente após esta ser aceite
         {
+            printf("Network_receive no Networ_main_loop\n");
             msg = network_receive(connsockfd); // Receber a mensagem do cliente
             if (msg == NULL)                   // Verificação da mensagem
             {
