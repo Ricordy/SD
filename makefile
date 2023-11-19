@@ -18,7 +18,7 @@ out: sdmessage libtable message.o stats.o client_stub.o network_client.o table_c
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
 
-table_server: $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/network_server.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o $(OBJ)/stats.o
+table_server: $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/stats.o $(OBJ)/network_server.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
 
 libtable: $(LIB)/libtable.a

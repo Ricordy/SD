@@ -3,7 +3,7 @@
 #include "sdmessage.pb-c.h"
 #include "stats.h"
 
-extern struct statistics_t server_stats; // Estatísticas globais do servidor
+extern struct statistics_t stats; // Estatísticas globais do servidor
 
 /* Inicia o skeleton da tabela.
  * O main() do servidor deve chamar esta função antes de poder usar a

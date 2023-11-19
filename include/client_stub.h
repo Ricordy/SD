@@ -61,6 +61,4 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable);
  */
 void rtable_free_entries(struct entry_t **entries);
 
-struct statistics_t *rtable_stats(struct rtable_t *rtable);
-
 #endif
