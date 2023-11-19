@@ -33,6 +33,7 @@ struct rtable_t *rtable_connect(char *address_port)
     {
         return NULL; // Retornar erro
     }
+    printf("A conectar ao servidor no socket: %d\n", tcp_table->sockfd);
     int networkstatus = network_connect(tcp_table);
     if (networkstatus == -1) // Tentar conectar ao servidor
     {
@@ -198,6 +199,7 @@ int rtable_del(struct rtable_t *rtable, char *key)
  */
 int rtable_size(struct rtable_t *rtable)
 {
+    printf("A obter o tamanho da tabela... no rtbale_size %d\n", rtable->sockfd);
     struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
 
     if (mensagem == NULL) // Verificação da alocação de espaço
@@ -212,10 +214,12 @@ int rtable_size(struct rtable_t *rtable)
         printf("Erro a obter numero de elementos da tabela\n");
         return -1;
     }
+    printf("A inicar a mensagem\n");
     message_t__init(mensagemConvert);                          // Inicialização da variavel de apoio
     mensagem->msgConvert = mensagemConvert;                    // Colocar a variavel de apoio na variavel de comunicação com o socket
     mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_SIZE; // Colocar o opcode da operação
     mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE; // Colocar o tipo de dados enviados no caso nenhum
+    printf("A enviar a mensagem para o network_send_recieve em table_size\n");
     // Enviar o pedido para o servidor e processar a resposta
     mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
     if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
@@ -226,11 +230,13 @@ int rtable_size(struct rtable_t *rtable)
         free(mensagem);
         return -1;
     }
+    printf("A libertar a mensagem\n");
     // Libertar memoria reservada e retornar tamanho pedido
     int tamanho = mensagem->msgConvert->n_keys;
     message_t__free_unpacked(mensagem->msgConvert, NULL);
     free(mensagemConvert);
     free(mensagem);
+    printf("A retornar o tamanho\n");
     return tamanho;
 }
 
@@ -328,6 +334,14 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable)
     free(mensagemConvert);
     free(mensagem);
     return entries;
+}
+
+/* Função que devolvce as estatisticas da tabela.
+ */
+
+struct statistics_t *rtable_stats(struct rtable_t *rtable)
+{
+    printf("Bonmito bonito");
 }
 
 /* Liberta a memória alocada por rtable_get_table().

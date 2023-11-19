@@ -9,13 +9,13 @@
  */
 struct rtable_t;
 
-/* Função para estabelecer uma associação entre o cliente e o servidor, 
+/* Função para estabelecer uma associação entre o cliente e o servidor,
  * em que address_port é uma string no formato <hostname>:<port>.
  * Retorna a estrutura rtable preenchida, ou NULL em caso de erro.
  */
 struct rtable_t *rtable_connect(char *address_port);
 
-/* Termina a associação entre o cliente e o servidor, fechando a 
+/* Termina a associação entre o cliente e o servidor, fechando a
  * ligação com o servidor e libertando toda a memória local.
  * Retorna 0 se tudo correr bem, ou -1 em caso de erro.
  */
@@ -32,7 +32,7 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry);
  */
 struct data_t *rtable_get(struct rtable_t *rtable, char *key);
 
-/* Função para remover um elemento da tabela. Vai libertar 
+/* Função para remover um elemento da tabela. Vai libertar
  * toda a memoria alocada na respetiva operação rtable_put().
  * Retorna 0 (OK), ou -1 (chave não encontrada ou erro).
  */
@@ -60,5 +60,7 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable);
 /* Liberta a memória alocada por rtable_get_table().
  */
 void rtable_free_entries(struct entry_t **entries);
+
+struct statistics_t *rtable_stats(struct rtable_t *rtable);
 
 #endif

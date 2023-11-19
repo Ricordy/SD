@@ -144,6 +144,13 @@ int invoke(MessageT *msg, struct table_t *table)
         msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
         return -1;
     }
+    else if (operacao == MESSAGE_T__OPCODE__OP_STATS)
+    {
+        // Operação de obtenção de estatisticas da tabela
+        msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
+        msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
+        return -1;
+    }
 
     return -1;
 }

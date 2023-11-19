@@ -9,6 +9,7 @@
 #include "client_stub-private.h"
 #include "client_stub.h"
 #include "inet.h"
+#include "stats.h"
 
 int main(int argc, char **argv)
 {
@@ -54,6 +55,7 @@ int main(int argc, char **argv)
             printf(" get <key>\n");
             printf(" put <key> <data>\n");
             printf(" getkeys\n");
+            printf(" stats\n");
             printf(" quit\n");
         }
         // Comando valido
@@ -68,7 +70,6 @@ int main(int argc, char **argv)
             {
                 printf("A obter o tamanho da tabela...  %d\n", rtable->sockfd);
                 int tamanho = rtable_size(rtable);
-                printf("Tamanho -> %d\n", tamanho);
                 printf("Tamanho -> %d\n", tamanho);
             }
             else if (strcmp(operacao, "del") == 0) // Comando DEL
@@ -155,6 +156,21 @@ int main(int argc, char **argv)
                     rtable_free_keys(keys);
                 }
             }
+            else if (strcmp(operacao, "stats") == 0) // Comando STATS
+            {
+                struct statistics_t *stats = rtable_stats(rtable); // Criação de variavel de apoio
+                if (stats == NULL)
+                {
+                    printf("Erro a obter as estatisticas!\n"); // Mensagem de erro
+                }
+                else
+                {
+                    printf("Numero total de operacoes: %d\n", stats->total_operations);
+                    printf("Numero de clientes ativos: %d\n", stats->connected_clients);
+                    printf("Tempo total acumulado nas execuções: %ld\n", stats->total_time);
+                    free(stats);
+                }
+            }
             else // Comando intruduzido é invalido
             {
                 printf("Introduza um comando valido!\n");
@@ -164,6 +180,7 @@ int main(int argc, char **argv)
                 printf(" get <key>\n");
                 printf(" put <key> <data>\n");
                 printf(" getkeys\n");
+                printf(" stats\n");
                 printf(" quit\n");
             }
         }
