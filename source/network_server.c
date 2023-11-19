@@ -154,13 +154,16 @@ int network_main_loop(int listening_socket, struct table_t *table)
             msg = network_receive(connsockfd); // Receber a mensagem do cliente
             if (msg == NULL)                   // Verificação da mensagem
             {
+                printf("Entrou no msg == NULL, no network_main_loop");
                 // message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
                 // free(msg);                           // Libertar a mensagem recebida
                 close(connsockfd); // Fechar a conexão com o cliente
                 printf("Erro a receber mensagem!\n");
                 break; // Sair do loop
             }
+            printf("Antes do Invoke\n");
             int inv = invoke(msg, table); // Executar a operação enviada pelo cliente
+            print("Depois do ionvoke\n");
             if (inv == -1)
             {
                 message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
@@ -181,6 +184,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
             else
             {
                 printf("Mensagem enviada!\n");
+                close(connsockfd);
             }        
         }
     }
