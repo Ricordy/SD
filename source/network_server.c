@@ -163,7 +163,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
             }
             printf("Antes do Invoke\n");
             int inv = invoke(msg, table); // Executar a operação enviada pelo cliente
-            print("Depois do ionvoke\n");
+            printf("Depois do ionvoke\n");
             if (inv == -1)
             {
                 message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
