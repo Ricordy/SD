@@ -64,6 +64,7 @@ int main(int argc, char **argv)
             if (strcmp(operacao, "quit") == 0) // Comando QUIT
             {
                 printf("A terminar a ligacao...\n");
+                rtable_disconnect(rtable);
                 break;
             }
             else if ((strcmp(operacao, "size") == 0)) // Comando SIZE

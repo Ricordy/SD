@@ -4,11 +4,12 @@
 #include "network_server.h"
 #include "table_skel.h"
 #include <pthread.h>
+#include "stats.h"
 
 struct u_args
 {
     int args;
-    struct table_t *tabela; 
+    struct table_t *tabela;
 };
 
 // Informações do socket
@@ -203,7 +204,7 @@ int network_main_loop(int listening_socket, struct table_t *table)
 
 /* A função network_receive() deve:
  * - Ler os bytes da rede, a partir do client_socket indicado;
- * - De-serializar estes bytes e construir a mensagem com o pedido, 
+ * - De-serializar estes bytes e construir a mensagem com o pedido,
  *   reservando a memória necessária para a estrutura MessageT.
  * Retorna a mensagem com o pedido ou NULL em caso de erro.
  */

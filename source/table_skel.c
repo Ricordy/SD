@@ -1,6 +1,7 @@
 #include "table.h"
 #include "inet.h"
 #include "sdmessage.pb-c.h"
+#include "stats.h"
 
 extern struct statistics_t server_stats; // Estatísticas globais do servidor
 

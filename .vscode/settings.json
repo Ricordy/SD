@@ -9,6 +9,7 @@
         "message-private.h": "c",
         "new": "c",
         "type_traits": "c",
-        "table_skel.h": "c"
+        "table_skel.h": "c",
+        "stats.h": "c"
     }
 }

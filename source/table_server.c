@@ -2,6 +2,7 @@
 #include "inet.h"
 #include "table_skel.h"
 #include "network_server.h"
+#include "stats.h"
 
 struct table_t *server_table;   // Tabela de dados
 struct statistics_t stats;      //Initialized at 0 because its a global variable
