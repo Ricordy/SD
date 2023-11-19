@@ -3,7 +3,8 @@
 #include "table_skel.h"
 #include "network_server.h"
 
-struct table_t *server_table; // Tabela de dados
+struct table_t *server_table;   // Tabela de dados
+struct statistics_t stats;      //Initialized at 0 because its a global variable
 
 // Manipulador para o sinal SIGINT (Ctrl+C)
 void termination_handler(int signum)

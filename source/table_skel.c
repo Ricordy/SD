@@ -2,6 +2,8 @@
 #include "inet.h"
 #include "sdmessage.pb-c.h"
 
+extern struct statistics_t server_stats; // Estatísticas globais do servidor
+
 /* Inicia o skeleton da tabela.
  * O main() do servidor deve chamar esta função antes de poder usar a
  * função invoke(). O parâmetro n_lists define o número de listas a
