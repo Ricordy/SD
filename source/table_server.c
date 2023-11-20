@@ -4,8 +4,7 @@
 #include "network_server.h"
 #include "stats.h"
 
-struct table_t *server_table;   // Tabela de dados
-struct statistics_t stats;      //Initialized at 0 because its a global variable
+struct table_t *server_table; // Tabela de dados
 
 // Manipulador para o sinal SIGINT (Ctrl+C)
 void termination_handler(int signum)

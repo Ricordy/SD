@@ -92,12 +92,12 @@ void *handle_client(void *arg)
 
     while (1)
     {
+        // Receber a mensagem do cliente
         printf("Network_receive no handle_client\n");
         msg = network_receive(connsockfd);
         printf("Depois do network_receive no handle_client\n");
         if (msg == NULL)
         {
-            printf("Entrou no msg == NULL, no handle_client");
             close(connsockfd);
             return (void *)-1;
             // break;
@@ -105,7 +105,10 @@ void *handle_client(void *arg)
 
         // Executa a operação enviada pelo cliente
         pthread_mutex_lock(&table_mutex);
-        sleep(5);
+        // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
+        struct timeval start, end;
+        gettimeofday(&start, NULL);
+        sleep(5); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
         int inv = invoke(msg, table);
         pthread_mutex_unlock(&table_mutex);
 
@@ -115,6 +118,20 @@ void *handle_client(void *arg)
             // close(connsockfd);
             return (void *)-1;
             // break;
+        }
+        else
+        {
+            // Terminar contagem de tempo da operação recorrendo a função gettimeofday
+            gettimeofday(&end, NULL);
+            // Incrementar o numero de operações e o total de tempo de execução no statistics_t se a operaçao for bem sucedida e não for um OP_STATS
+            if (msg->opcode != MESSAGE_T__OPCODE__OP_STATS)
+            {
+                pthread_mutex_lock(&server_stats.stats_mutex);
+                server_stats.total_operations++;
+                server_stats.total_time += (end.tv_sec - start.tv_sec) * 1000000.0;
+                pthread_mutex_unlock(&server_stats.stats_mutex);
+            }
+            printf("Mensagem enviada!\n");
         }
     }
 
@@ -139,17 +156,10 @@ int network_main_loop(int listening_socket, struct table_t *table)
 {
     int connsockfd;       // Variavel para armazenar o descritor do socket
     MessageT *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
-                          // accept(listening_socket, (struct sockaddr *)&client, &size_client)
-                          // accept(listening_socket, NULL, 0))
-
-    // while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) > 0) // Ciclo para aguardar e aceitar conexões de clientes
-    // {
 
     while (1) // Lidar com a conexão do cliente após esta ser aceite
     {
-        printf("Antes do accept\n");
         connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client);
-        printf("Recebeu cliente no mainloop!\n");
         if (connsockfd < 0) // Verificação do socket recebido pela função accept
         {
             perror("Error no accept!\n");
@@ -167,57 +177,15 @@ int network_main_loop(int listening_socket, struct table_t *table)
 
         argumentos->args = connsockfd;
         argumentos->tabela = table;
-
-        printf("Antes do pthread_create\n");
-        printf("Args: %d\n", argumentos->args);
         pthread_t thread_id;
         if (pthread_create(&thread_id, NULL, handle_client, (void *)argumentos) != 0)
         {
             fprintf(stderr, "Erro ao criar a thread\n");
             continue;
         }
-
-        // printf("Network_receive no Networ_main_loop\n");
-        // msg = network_receive(connsockfd); // Receber a mensagem do cliente
-        // if (msg == NULL)                   // Verificação da mensagem
-        // {
-        //     printf("Entrou no msg == NULL, no network_main_loop");
-        //     // message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
-        //     // free(msg);                           // Libertar a mensagem recebida
-        //     // close(connsockfd); // Fechar a conexão com o cliente
-        //     printf("Erro a receber mensagem!\n");
-        //     break; // Sair do loop
-        // }
-        // printf("Antes do Invoke\n");
-        // int inv = invoke(msg, table); // Executar a operação enviada pelo cliente
-        // printf("Depois do ionvoke\n");
-        // if (inv == -1)
-        // {
-        //     message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
-        //     // free(msg);                           // Libertar a mensagem recebida
-        //     // close(connsockfd); // Fechar a conexão com o cliente
-        //     printf("Erro invoke!\n");
-        //     break; // Saia do loop interno em caso de erro
-        // }
-
-        // if (network_send(connsockfd, msg) == -1)
-        // {
-        //     // message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
-        //     // free(msg);                           // Libertar a estrutura de mensagem
-        //     // close(connsockfd); // Fechar a conexão com o cliente
-        //     printf("Erro a enviar mensagem!\n");
-        //     break; // Saia do loop interno em caso de erro
-        // }
-        // else
-        // {
-        //     printf("Mensagem enviada!\n");
-        // }
     }
 }
 
-// {
-//     message_t__free_unpacked(msg, NULL); // Libertar a mensagem recebida
-//     free(msg);                           /network_receive
 /* A função network_receive() deve:
  * - Ler os bytes da rede, a partir do client_socket indicado;
  * - De-serializar estes bytes e construir a mensagem com o pedido,

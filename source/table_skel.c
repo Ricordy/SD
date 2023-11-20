@@ -3,7 +3,7 @@
 #include "sdmessage.pb-c.h"
 #include "stats.h"
 
-extern struct statistics_t stats; // Estatísticas globais do servidor
+extern struct statistics_t server_stats; // Estatísticas globais do servidor
 
 /* Inicia o skeleton da tabela.
  * O main() do servidor deve chamar esta função antes de poder usar a
@@ -160,7 +160,7 @@ int invoke(MessageT *msg, struct table_t *table)
             msg->opcode += 1;
             msg->c_type = MESSAGE_T__C_TYPE__CT_RESULT;
             msg->value.len = sizeof(struct statistics_t);
-            memcpy(msg->value.data, &stats, sizeof(struct statistics_t));
+            memcpy(msg->value.data, &server_stats, sizeof(struct statistics_t));
             return 0;
         }
     }

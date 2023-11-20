@@ -19,5 +19,6 @@ void start_timing(struct timeval *t);
 double stop_timing(const struct timeval *t);
 
 // Update the stats
-void update_stats(struct statistics *stats, int op_code, double ms);
+void update_stats(struct statistics_t *stats, int op_code, double ms);
+
 #endif // STATS_H
