@@ -342,6 +342,41 @@ struct entry_t **rtable_get_table(struct rtable_t *rtable)
 struct statistics_t *rtable_stats(struct rtable_t *rtable)
 {
     printf("Bonmito bonito");
+    struct message_t *mensagem = malloc(sizeof(struct message_t)); // Criação da variavel para escrita da mensagem no socket
+    if (mensagem == NULL)                                          // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+
+    struct _MessageT *mensagemConvert = malloc(sizeof(struct _MessageT)); // Criação da variavel de apoio
+    if (mensagemConvert == NULL)                                          // Verificação da alocação de espaço
+    {
+        return NULL;
+    }
+    message_t__init(mensagemConvert);                           // Inicialização da variavel de apoio
+    mensagem->msgConvert = mensagemConvert;                     // Colocar a variavel de apoio na variavel de comunicação com o socket
+    mensagem->msgConvert->opcode = MESSAGE_T__OPCODE__OP_STATS; // Colocar o opcode da operação
+    mensagem->msgConvert->c_type = MESSAGE_T__C_TYPE__CT_NONE;  // Colocar o tipo de dados enviados no caso nenhum
+
+    // Enviar o pedido para o servidor e processar a resposta
+    mensagem->msgConvert = network_send_receive(rtable, mensagem->msgConvert);
+    if (mensagem->msgConvert->opcode == MESSAGE_T__OPCODE__OP_ERROR)
+    {
+        // Imprimir erro e libertar memoria reservada
+        printf("Erro a obter as estatisticas da tabela\n");
+        message_t__free_unpacked(mensagem->msgConvert, NULL);
+        free(mensagemConvert);
+        free(mensagem);
+        return NULL;
+    }
+    // Libertar memoria reservada e retornar as keys pedidas
+    struct statistics_t *stats = (struct statistics_t *)mensagem->msgConvert->value.data;
+    mensagem->msgConvert->value.data = NULL;
+    mensagem->msgConvert->value.len = 0;
+    message_t__free_unpacked(mensagem->msgConvert, NULL);
+    free(mensagemConvert);
+    free(mensagem);
+    return stats;
 }
 
 /* Liberta a memória alocada por rtable_get_table().

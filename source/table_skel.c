@@ -149,11 +149,20 @@ int invoke(MessageT *msg, struct table_t *table)
     }
     else if (operacao == MESSAGE_T__OPCODE__OP_STATS)
     {
-        // Operação de obtenção de estatisticas da tabela
-        msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
-        msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
-        return -1;
+        msg->value.data = malloc(sizeof(struct statistics_t));
+        if (msg->value.data == NULL)
+        {
+            perror("Erro ao alocar memória para a estrutura statistics_t");
+            return -1;
+        }
+        else
+        {
+            msg->opcode += 1;
+            msg->c_type = MESSAGE_T__C_TYPE__CT_RESULT;
+            msg->value.len = sizeof(struct statistics_t);
+            memcpy(msg->value.data, &stats, sizeof(struct statistics_t));
+            return 0;
+        }
     }
-
     return -1;
 }
