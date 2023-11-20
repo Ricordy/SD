@@ -18,7 +18,4 @@ double stop_timing(const struct timeval *t)
     return ms;
 }
 
-// // Update the stats
-// void update_stats(struct statistics *stats, int op_code, double ms)
-// {
-// }
+

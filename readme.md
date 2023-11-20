@@ -1,12 +1,15 @@
 Trabalho realizado por: 
 
-Rodrigo Barrocas - 49%
-Matheus Nunes - 49%
-Pedro Vaz - 2 %
+Rodrigo Barrocas - 50%
+Matheus Nunes - 50%
 
-Todos os requisitos do makefile estão cumpridos. 
-O cliente conecta-se ao servidor e desconecta-se 
-O servidor aceita conexões edesconexões.
+Limitacoes: 
 
-Erros: 
-- Tanto o cliente como o servidor ficam pendurados à quando tentam ler a informação. Gastamos imenso tempo a tentar entender o porque desta situação, mas não conseguimos, visto que as operações de write parecem funcionar.
+- Referente a fase 2: 
+-   Corrigimos todos os problemas de ligacao e de comunicacao
+-   A operação Size funciona, a Put nao esta 100% implementada, as outras operacoes nao chegamos a acabar a       implementacao
+
+- Referente a fase 3:
+-   Conseguimos implementar o mutex 
+-   Deixamos um sleep(3) no codigo para ser possivel testar o mutex
+-   O Stats esta implementado, o que nao consegue eh decrementar quando um cliente disconecta

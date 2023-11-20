@@ -55,8 +55,7 @@ int network_connect(struct rtable_t *rtable)
 MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 {
 
-    printf("network_send_receive ---- ");
-    printf("rtable->sockfd: %d\n", rtable->sockfd);
+
     int client_socket = rtable->sockfd;
     // Verificar se socket é válido
     if (client_socket == -1)
@@ -64,24 +63,24 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         fprintf(stderr, "Erro: Socket não aberto.\n");
         return NULL;
     }
-    printf("pre message_t__get_packed_size\n ");
+
     // Serializar a mensagem
     unsigned short message_len = message_t__get_packed_size(msg);
     // size_t message_len = message_t__get_packed_size(msg);
     uint8_t *message_buffer = (uint8_t *)malloc(message_len);
-    printf("pre message_t__pack\n ");
+
     message_t__pack(msg, message_buffer);
     // Tamanho da mensagem
     // uint16_t message_size = (uint16_t)message_len;
     int message_size = htons(message_len);
-    printf("pre write_all\n ");
+
     if (write_all(client_socket, &message_size, sizeof(short)) == -1)
     {
         perror("Erro ao enviar mensagem com este tamanho");
         free(message_buffer);
         return NULL;
     }
-    printf("pre write_all 2...............\n ");
+
     // Mensagem serializada
     if (write_all(client_socket, message_buffer, message_len) == -1)
     {
@@ -89,7 +88,7 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         free(message_buffer);
         return NULL;
     }
-    printf("pre read_all. client_socket: %d\n ", client_socket);
+
     // Receção tamanho resposta
     short response_size;
     if (read_all(client_socket, &response_size, sizeof(short)) < 0)
@@ -98,7 +97,7 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         free(message_buffer);
         return NULL;
     }
-    printf("pre read all 2 .............\n ");
+
 
     response_size = ntohs(response_size);
     // Receção resposta

@@ -69,7 +69,6 @@ int main(int argc, char **argv)
             }
             else if ((strcmp(operacao, "size") == 0)) // Comando SIZE
             {
-                printf("A obter o tamanho da tabela...  %d\n", rtable->sockfd);
                 int tamanho = rtable_size(rtable);
                 printf("Tamanho -> %d\n", tamanho);
             }

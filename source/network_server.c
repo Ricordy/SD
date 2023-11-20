@@ -79,23 +79,15 @@ void *handle_client(void *arg)
     struct table_t *table = args->tabela;
     MessageT *msg = NULL;
 
-    printf("Lidar com o cliente!\n");
-    printf("Args: %d\n", connsockfd);
-
-    printf("Antes do muetex lock\n");
     pthread_mutex_lock(&server_stats.stats_mutex);
-    printf("Antes do server_stats.connected_clients++\n");
     server_stats.connected_clients++;
-    printf("Depois do server_stats.connected_clients++\n");
     pthread_mutex_unlock(&server_stats.stats_mutex);
-    printf("Depois do mutex unlock\n");
+
 
     while (1)
     {
         // Receber a mensagem do cliente
-        printf("Network_receive no handle_client\n");
         msg = network_receive(connsockfd);
-        printf("Depois do network_receive no handle_client\n");
         if (msg == NULL)
         {
             close(connsockfd);
@@ -108,7 +100,7 @@ void *handle_client(void *arg)
         // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
         struct timeval start, end;
         gettimeofday(&start, NULL);
-        sleep(5); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
+        sleep(3); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
         int inv = invoke(msg, table);
         pthread_mutex_unlock(&table_mutex);
 
@@ -197,8 +189,6 @@ MessageT *network_receive(int client_socket)
     short size; // Variavel de apoio para armazenar tmnh da mensagem
 
     // Receber o tamanho da mensagem
-    printf("Before Receber o tamanho da mensagem no network recieve\n");
-    printf("client_socket: %d\n", client_socket);
     if (read_all(client_socket, &size, sizeof(short)) <= 0)
     {
         printf("Erro a receber o tamanho da mensagem!\n");
@@ -207,7 +197,7 @@ MessageT *network_receive(int client_socket)
 
     // Converter o tamanho de rede de ordem de bytes da network para a ordem de bytes do host
     size = ntohs(size);
-    printf("After Receber o tamanho da mensagem no network recieve\n");
+
     // Verificar se o tamanho da mensagem é válido
     if (size <= 0)
     {
@@ -215,7 +205,7 @@ MessageT *network_receive(int client_socket)
         return NULL;
     }
 
-    printf("Before Alocar memória para o buffer da mensagem\n");
+
     // Alocar memória para o buffer da mensagem
     uint8_t *buf = (uint8_t *)malloc(size);
     if (buf == NULL)
@@ -223,7 +213,7 @@ MessageT *network_receive(int client_socket)
         perror("Erro ao alocar memória para a mensagem recebida");
         return NULL;
     }
-    printf("After Alocar memória para o buffer da mensagem\n");
+
     // Receber a mensagem recorrendo ao read_all
     if (read_all(client_socket, buf, size) != size)
     {
@@ -279,7 +269,7 @@ int network_send(int client_socket, MessageT *msg)
 
     // Converter o tamanho da mensagem para a ordem de bytes da rede
     int sizeEnviar = htons(len);
-    printf("Before Enviar o tamanho do buffer\n");
+
     // Enviar o tamanho do buffer
     int sizeEnviado;
     if ((sizeEnviado = write_all(client_socket, &sizeEnviar, sizeof(short)) != sizeof(short)))
@@ -289,15 +279,11 @@ int network_send(int client_socket, MessageT *msg)
         free(buf);
         return -1; // Retorna -1 em caso de erro no envio do tamanho do buffer
     }
-    printf("After Enviar o tamanho do buffer\n");
 
-    printf("Before message_t_free\n");
     // Libetar a memória ocupada pela mensagem
     message_t__free_unpacked(msg, NULL);
     // free(msg);
-    printf("After message_t_free\n");
 
-    printf("Before Enviar o buffer\n");
     // Enviar o buffer
     int nbytes;
     if ((nbytes = write_all(client_socket, buf, len) != len))
@@ -307,7 +293,7 @@ int network_send(int client_socket, MessageT *msg)
         free(buf);
         return -1; // Retorna -1 em caso de erro no envio do buffer
     }
-    printf("After Enviar o buffern");
+
 
     // Libetar a memoria do buffer
     free(buf);
