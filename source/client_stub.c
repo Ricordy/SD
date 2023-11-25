@@ -232,7 +232,7 @@ int rtable_size(struct rtable_t *rtable)
     }
 
     // Libertar memoria reservada e retornar tamanho pedido
-    int tamanho = mensagem->msgConvert->n_keys;
+    int tamanho = mensagem->msgConvert->result;
     message_t__free_unpacked(mensagem->msgConvert, NULL);
     free(mensagemConvert);
     free(mensagem);
@@ -273,13 +273,24 @@ char **rtable_get_keys(struct rtable_t *rtable)
         free(mensagem);
         return NULL;
     }
+
+    int num_keys = mensagem->msgConvert->n_keys;
+    char **result = malloc((num_keys + 1) * sizeof(char *));
+    char *keys = mensagem->msgConvert->keys;
+    char *keyref = keys;
+    for (int i = 0; i < num_keys; i++)
+    {
+        result[i] = keyref;
+        printf("key: %s \n", keyref);
+        keyref += strlen(keyref) + 1;
+    }
+    result[num_keys] = NULL;
+
     // Libertar memoria reservada e retornar as keys pedidas
-    char **keys = mensagem->msgConvert->keys;
-    mensagem->msgConvert->keys = NULL;
     message_t__free_unpacked(mensagem->msgConvert, NULL);
     free(mensagemConvert);
     free(mensagem);
-    return keys;
+    return result;
 }
 
 /* Liberta a memória alocada por rtable_get_keys().

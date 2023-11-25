@@ -141,7 +141,7 @@ int invoke(MessageT *msg, struct table_t *table)
             msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
             return -1;
         }
-
+        msg->n_keys = table_size(table);
         msg->keys = keys;
         return 0;
     }

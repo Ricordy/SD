@@ -140,20 +140,12 @@ int main(int argc, char **argv)
             else if (strcmp(operacao, "getkeys") == 0) // Comando GETKEYS
             {
                 char **keys = rtable_get_keys(rtable); // Criação de variavel de apoio
-                if (keys == NULL)                      // Verificação dos dados obtidos na variavel de apoio
+                printf("vou imprimir keys: \n");
+                int index;                                       // Variavel de apoio
+                for (index = 0; keys[index] != NULL; index += 1) // Ciclio para imprimir as keys na tela
                 {
-                    printf("Erro a obter as keys!\n"); // Mensagem de erro
-                }
-                else
-                {
-                    int index;                                           // Variavel de apoio
-                    int numeroEntradas = rtable_size(rtable);            // Variavel de apoio com tamanho da tabela
-                    for (index = 0; index != numeroEntradas; index += 1) // Ciclio para imprimir as keys na tela
-                    {
-                        printf("%s \n", keys[index]);
-                    }
-                    // Libertar a memoria alocada pela variavel de apoio
-                    rtable_free_keys(keys);
+                    printf("tentei %d \n", index);
+                    printf("%s \n", keys[index]);
                 }
             }
             else if (strcmp(operacao, "stats") == 0) // Comando STATS
