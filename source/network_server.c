@@ -83,7 +83,6 @@ void *handle_client(void *arg)
     server_stats.connected_clients++;
     pthread_mutex_unlock(&server_stats.stats_mutex);
 
-
     while (1)
     {
         // Receber a mensagem do cliente
@@ -205,7 +204,6 @@ MessageT *network_receive(int client_socket)
         return NULL;
     }
 
-
     // Alocar memória para o buffer da mensagem
     uint8_t *buf = (uint8_t *)malloc(size);
     if (buf == NULL)
@@ -234,7 +232,8 @@ MessageT *network_receive(int client_socket)
     // Deserializa a mensagem
     MessageT *msgRecebida = (struct _MessageT *)message_t__unpack(NULL, size, buf);
     free(buf);
-
+    printf("mensagem aqui.... \n");
+    printf("Mensagem recebida, key: %s \n", msgRecebida->key);
     // Verifica se a deserialização foi bem-sucedida
     if (msgRecebida == NULL)
     {
@@ -293,7 +292,6 @@ int network_send(int client_socket, MessageT *msg)
         free(buf);
         return -1; // Retorna -1 em caso de erro no envio do buffer
     }
-
 
     // Libetar a memoria do buffer
     free(buf);

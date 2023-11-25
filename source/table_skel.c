@@ -43,11 +43,13 @@ int table_skel_destroy(struct table_t *table)
  */
 int invoke(MessageT *msg, struct table_t *table)
 {
+    printf("Entrei invoke \n");
     if (table == NULL || msg == NULL)
     {
         return -1; // Erro, tabela ou mensagem nulos
     }
 
+    printf("Parametros OK, efetuar operação.... \n");
     // Extrai informações do opcode e conteúdo da mensagem
     short operacao = msg->opcode;
     short conteudo = msg->c_type;
@@ -116,8 +118,9 @@ int invoke(MessageT *msg, struct table_t *table)
 
         struct data_t *dataTemp = data_create(msg->value.len, msg->value.data);
 
-        if ((table_put(table, msg->entry->key, dataTemp)) == -1)
+        if ((table_put(table, msg->key, dataTemp)) == -1)
         {
+
             msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
             return -1;
         }
