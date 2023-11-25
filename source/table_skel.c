@@ -91,6 +91,7 @@ int invoke(MessageT *msg, struct table_t *table)
     }
     else if (operacao == MESSAGE_T__OPCODE__OP_GET)
     {
+        printf("Entrei no get na função invoke... \n");
         // Operação de encontrar um valor da tabela
         msg->opcode += 1;
         msg->c_type = MESSAGE_T__C_TYPE__CT_VALUE;
@@ -98,11 +99,12 @@ int invoke(MessageT *msg, struct table_t *table)
 
         if (conteudo == MESSAGE_T__C_TYPE__CT_KEY)
         {
+            printf("Conterudo certo, a efetuar table_get.... \n");
             if ((dataReceived = table_get(table, msg->key)) != NULL)
             {
                 msg->value.data = dataReceived->data;
                 msg->value.len = dataReceived->datasize;
-                data_destroy(dataReceived);
+                // data_destroy(dataReceived);
                 return 0;
             }
         }

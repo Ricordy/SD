@@ -99,7 +99,7 @@ void *handle_client(void *arg)
         // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
         struct timeval start, end;
         gettimeofday(&start, NULL);
-        sleep(3); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
+        // sleep(3); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
         int inv = invoke(msg, table);
         pthread_mutex_unlock(&table_mutex);
 
