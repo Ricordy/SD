@@ -3,8 +3,10 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/inc",
-                "${workspaceFolder}/tests",
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "/usr/include/x86_64-linux-gnu/c++/11",
                 "${workspaceFolder}/include"
             ],
             "defines": [

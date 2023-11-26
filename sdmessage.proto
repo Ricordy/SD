@@ -19,6 +19,7 @@ message message_t			/* Formato da mensagem MessageT */
 		OP_SIZE	= 40;
 		OP_GETKEYS	= 50;
 		OP_GETTABLE	= 60;
+		OP_STATS 	= 70;
 		OP_ERROR	= 99;
 	}
 
@@ -30,6 +31,7 @@ message message_t			/* Formato da mensagem MessageT */
 		CT_RESULT	= 40;
 		CT_KEYS	= 50;
 		CT_TABLE	= 60;
+		CT_STATS	= 80;
 		CT_NONE	= 70;
 	}
 
