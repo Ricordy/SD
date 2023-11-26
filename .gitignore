@@ -1,0 +1,5 @@
+binary/*
+lib/*
+object/general/*
+include/sdmessage.pb-c.h
+source/sdmessage.pb-c.c
