@@ -203,5 +203,48 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
 
 int server_zoo_setwatch(enum server_status *status)
 {
-    
+    if (!is_connected)
+        return -1;
+
+    if (ZOK != zoo_wget_children(zh, "/kvstore", &child_watcher, status, NULL))
+    {
+        printf("ERROR! - Couldn't set watch at /kvstore");
+        return -1;
+    }
+    return 0;
+}
+
+int server_zoo_get_primary(char *meta_data, int size)
+{
+    if (!is_connected)
+        return -1;
+    memset(meta_data, 0, size);
+    if (ZOK != zoo_get(zh, "/kvstore/primary", 0, meta_data, &size, NULL))
+    {
+        printf("Error! - Couldn't get data at primary in zookeeper");
+        return -1;
+    }
+    return size;
+}
+
+int server_zoo_get_backup(char *meta_data, int size)
+{
+    if (!is_connected)
+        return -1;
+    memset(meta_data, 0, size);
+    if (ZOK != zoo_get(zh, "/kvstore/backup", 0, meta_data, &size, NULL))
+    {
+        printf("Error! - Couldn't get data at backup in zookeeper");
+        return -1;
+    }
+    return size;
+}
+
+void server_zoo_close()
+{
+    if (is_connected == 1)
+    {
+        zookeeper_close(zh);
+        is_connected = 0;
+    }
 }
