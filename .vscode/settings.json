@@ -10,6 +10,7 @@
         "new": "c",
         "type_traits": "c",
         "table_skel.h": "c",
-        "stats.h": "c"
+        "stats.h": "c",
+        "server_redundancy.h": "c"
     }
 }

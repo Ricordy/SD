@@ -1,7 +1,10 @@
 #include "table.h"
 #include "inet.h"
 #include "message-private.h"
+#include "server_redundancy.h"
 #include "network_server.h"
+#include "client_stub.h"
+#include "client_stub-private.h"
 #include "table_skel.h"
 #include <pthread.h>
 #include "stats.h"
@@ -20,6 +23,8 @@ int nbytes, count;                 // Variaveis para armazenar o numero de bytes
 socklen_t size_client;             // Variavel para armazenar o tamanho da estrutura do cliente
 
 struct statistics_t server_stats; // Estatísticas globais do servidor
+
+extern enum server_status server_status; // Estado do servidor
 
 pthread_mutex_t table_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex para proteger o acesso à tabela
 
@@ -85,25 +90,78 @@ void *handle_client(void *arg)
 
     while (1)
     {
-        // Receber a mensagem do cliente
-        msg = network_receive(connsockfd);
-        if (msg == NULL)
+        // Receber a mensagem server_table
+        struct timeval start, end; // Variaveis para armazenar o tempo de execução da operação
+
+        // Verificar o OPCode da mensagem recebida para saber se a operção é executada localmente ou se é enviada para o servidor primário
+        if ((msg->opcode == MESSAGE_T__OPCODE__OP_DEL || msg->opcode == MESSAGE_T__OPCODE__OP_PUT) && server_status != BACKUP)
         {
-            close(connsockfd);
-            return (void *)-1;
-            // break;
+            char *backup_address = malloc(DATAMAXLEN);
+            if (server_status == PRIMARY_WITH_BACKUP && server_zoo_get_backup(backup_address, DATAMAXLEN) != -1)
+            {
+                // Establecer conexão com o servidor de backup
+                struct rtable_t *rtable = rtable_connect(backup_address);
+                MessageT *msg_backup = network_send_receive(rtable, msg);
+                if (msg_backup->opcode != MESSAGE_T__OPCODE__OP_ERROR)
+                {
+                    if (invoke(msg, table) < 0)
+                    {
+                        perror("Error a processar a resposta na thread");
+                        return (void *)-1;
+                    }
+                }
+                else
+                {
+                    perror("Erro ao enviar mensagem para o servidor de backup");
+                    return (void *)-1;
+                }
+                rtable_disconnect(rtable);
+            }
+            else
+            {
+                perror("Erro ao obter o endereço do servidor de backup");
+            }
+
+            free(backup_address);
         }
+        else
+        {
 
-        // Executa a operação enviada pelo cliente
-        pthread_mutex_lock(&table_mutex);
-        // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
-        struct timeval start, end;
-        gettimeofday(&start, NULL);
-        // sleep(3); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
-        int inv = invoke(msg, table);
-        pthread_mutex_unlock(&table_mutex);
+            // Executa a operação enviada pelo cliente
+            pthread_mutex_lock(&server_stats.stats_mutex);
+            server_stats.connected_clients--;
+            pthread_mutex_unlock(&server_stats.stats_mutex);
+            close(connsockfd);
+            pthread_exit(NULL);
+            phread_mutex_lock(&table_mutex);
+            // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
+            gettimeofday(&start, NULL);
+            // sleep(3); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
+            int inv = invoke(msg, table);
+            pthread_mutex_unlock(&table_mutex);
 
-        if (inv == -1 || network_send(connsockfd, msg) == -1)
+            if (inv < 0)
+            {
+                perror("Error a processar a resposta na thread");
+                return (void *)-1;
+            }
+            else
+            {
+                // Terminar contagem de tempo da operação recorrendo a função gettimeofday
+                gettimeofday(&end, NULL);
+                // Incrementar o numero de operações e o total de tempo de execução no statistics_t se a operaçao for bem sucedida e não for um OP_STATS
+                if (msg->opcode != MESSAGE_T__OPCODE__OP_STATS)
+                {
+                    pthread_mutex_lock(&server_stats.stats_mutex);
+                    server_stats.total_operations++;
+                    server_stats.total_time += (end.tv_sec - start.tv_sec) * 1000000.0;
+                    pthread_mutex_unlock(&server_stats.stats_mutex);
+                }
+                printf("Mensagem enviada!\n");
+            }
+        }
+        // Enviar a resposta ao cliente
+        if (network_send(connsockfd, msg) == -1)
         {
             perror("Erro a enviar mensagem ou no invoke!\n");
             // close(connsockfd);
@@ -124,13 +182,13 @@ void *handle_client(void *arg)
             }
             printf("Mensagem enviada!\n");
         }
-    }
 
-    pthread_mutex_lock(&server_stats.stats_mutex);
-    server_stats.connected_clients--;
-    pthread_mutex_unlock(&server_stats.stats_mutex);
-    close(connsockfd);
-    pthread_exit(NULL);
+        pthread_mutex_lock(&server_stats.stats_mutex);
+        server_stats.connected_clients--;
+        pthread_mutex_unlock(&server_stats.stats_mutex);
+        close(connsockfd);
+        pthread_exit(NULL);
+    }
 }
 
 /* A função network_main_loop() deve:

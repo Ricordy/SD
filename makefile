@@ -1,4 +1,4 @@
-CFLAGS = -Wall -I include -g -no-pie
+CFLAGS = -Wall -I include -g -no-pie 
 CC = gcc
 SRC = source
 INCLUDE = include
@@ -12,14 +12,14 @@ EXECUTABLES = table_client table_server
 LIBTABLE_OBJS = $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o
 
 
-out: sdmessage libtable message.o stats.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_server.o table_skel.o $(EXECUTABLES)
+out: sdmessage libtable message.o server_redundancy.o stats.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_server.o table_skel.o $(EXECUTABLES)
 
 
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o
-	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
+	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt
 
-table_server: $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/stats.o $(OBJ)/network_server.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o
-	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c
+table_server:  $(OBJ)/network_server.o $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/stats.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o $(OBJ)/server_redundancy.o $(OBJ)/client_stub.o $(OBJ)/network_client.o
+	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt 
 
 libtable: $(LIB)/libtable.a
 
@@ -55,7 +55,7 @@ client_stub.o: $(SRC)/client_stub.c $(INCLUDE)/client_stub.h  $(INCLUDE)/data.h 
 table_client.o: $(SRC)/table_client.c $(INCLUDE)/client_stub.h  $(INCLUDE)/network_client.h   $(INCLUDE)/client_stub-private.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
-table_server.o: $(SRC)/table_server.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/network_server.h
+table_server.o: $(SRC)/table_server.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h $(INCLUDE)/server_redundancy.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 table_skel.o: $(SRC)/table_skel.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/sdmessage.pb-c.h
@@ -64,10 +64,13 @@ table_skel.o: $(SRC)/table_skel.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCL
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
-network_server.o: $(SRC)/network_server.c $(SRC)/stats.c $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h
+network_server.o: $(SRC)/network_server.c $(SRC)/stats.c $(SRC)/table_server.c $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h $(INCLUDE)/server_redundancy.h $(INCLUDE)/client_stub.h $(INCLUDE)/client_stub-private.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 message.o: $(SRC)/message.c $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+
+server_redundancy.o: $(SRC)/server_redundancy.c $(INCLUDE)/server_redundancy.h 
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 clean:

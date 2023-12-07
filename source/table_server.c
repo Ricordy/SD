@@ -1,10 +1,12 @@
 #include <signal.h>
 #include "inet.h"
 #include "table_skel.h"
+#include "server_redundancy.h"
 #include "network_server.h"
 #include "stats.h"
 
 struct table_t *server_table; // Tabela de dados
+enum server_status status;    // Estado do servidor
 
 // Manipulador para o sinal SIGINT (Ctrl+C)
 void termination_handler(int signum)
