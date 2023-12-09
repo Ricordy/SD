@@ -12,13 +12,13 @@ EXECUTABLES = table_client table_server
 LIBTABLE_OBJS = $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o
 
 
-out: sdmessage libtable message.o server_redundancy.o stats.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_server.o table_skel.o $(EXECUTABLES)
+out: sdmessage libtable message.o private_functions.o server_redundancy.o stats.o client_stub.o network_client.o table_client.o sdmessage.o network_server.o table_server.o table_skel.o $(EXECUTABLES)
 
 
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt
 
-table_server:  $(OBJ)/network_server.o $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/stats.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o $(OBJ)/server_redundancy.o $(OBJ)/client_stub.o $(OBJ)/network_client.o
+table_server:  $(OBJ)/network_server.o $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/stats.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o $(OBJ)/server_redundancy.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/private_functions.o
 	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt 
 
 libtable: $(LIB)/libtable.a
@@ -55,7 +55,7 @@ client_stub.o: $(SRC)/client_stub.c $(INCLUDE)/client_stub.h  $(INCLUDE)/data.h 
 table_client.o: $(SRC)/table_client.c $(INCLUDE)/client_stub.h  $(INCLUDE)/network_client.h   $(INCLUDE)/client_stub-private.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
-table_server.o: $(SRC)/table_server.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h $(INCLUDE)/server_redundancy.h
+table_server.o: $(SRC)/table_server.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h $(INCLUDE)/server_redundancy.h $(INCLUDE)/private_functions.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 table_skel.o: $(SRC)/table_skel.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/sdmessage.pb-c.h
@@ -71,6 +71,9 @@ message.o: $(SRC)/message.c $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 server_redundancy.o: $(SRC)/server_redundancy.c $(INCLUDE)/server_redundancy.h 
+	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
+
+private_functions.o: $(SRC)/private_functions.c $(INCLUDE)/private_functions.h 
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 clean:

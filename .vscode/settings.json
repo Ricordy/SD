@@ -11,6 +11,8 @@
         "type_traits": "c",
         "table_skel.h": "c",
         "stats.h": "c",
-        "server_redundancy.h": "c"
+        "server_redundancy.h": "c",
+        "private_functions.h": "c",
+        "stdlib.h": "c"
     }
 }
