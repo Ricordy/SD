@@ -104,7 +104,7 @@ void *handle_client(void *arg)
                 MessageT *msg_backup = network_send_receive(rtable, msg);
                 if (msg_backup->opcode != MESSAGE_T__OPCODE__OP_ERROR)
                 {
-                    if (invoke(msg, table) < 0)
+                    if (invoke(msg, table) < 0) // FIX NESTA MERDA
                     {
                         perror("Error a processar a resposta na thread");
                         return (void *)-1;
@@ -126,14 +126,7 @@ void *handle_client(void *arg)
         }
         else
         {
-
-            // Executa a operação enviada pelo cliente
-            pthread_mutex_lock(&server_stats.stats_mutex);
-            server_stats.connected_clients--;
-            pthread_mutex_unlock(&server_stats.stats_mutex);
-            close(connsockfd);
-            pthread_exit(NULL);
-            phread_mutex_lock(&table_mutex);
+            pthread_mutex_lock(&table_mutex);
             // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
             gettimeofday(&start, NULL);
             // sleep(3); // Sleep utilizado para verificar se o mutex está a funcionar corretamente
@@ -167,20 +160,6 @@ void *handle_client(void *arg)
             // close(connsockfd);
             return (void *)-1;
             // break;
-        }
-        else
-        {
-            // Terminar contagem de tempo da operação recorrendo a função gettimeofday
-            gettimeofday(&end, NULL);
-            // Incrementar o numero de operações e o total de tempo de execução no statistics_t se a operaçao for bem sucedida e não for um OP_STATS
-            if (msg->opcode != MESSAGE_T__OPCODE__OP_STATS)
-            {
-                pthread_mutex_lock(&server_stats.stats_mutex);
-                server_stats.total_operations++;
-                server_stats.total_time += (end.tv_sec - start.tv_sec) * 1000000.0;
-                pthread_mutex_unlock(&server_stats.stats_mutex);
-            }
-            printf("Mensagem enviada!\n");
         }
 
         pthread_mutex_lock(&server_stats.stats_mutex);
