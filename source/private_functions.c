@@ -1,10 +1,9 @@
-/* Grupo 16
- * Afonso Esteves 54394
- * Vicente Sousa 55386
- * João Anjos 54476
+/* Grupo 58
+ * Rodrigo Barrocas 53680
+ * Matheus Nunes 47883
  */
 
-#include "helper/priv-func.h"
+#include "private_functions.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -16,7 +15,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-void strapp(char **str, const char *app)
+void strappend(char **str, const char *app)
 {
     *str = realloc(*str, (strlen(*str) + strlen(app) + 1) * sizeof(char));
     memcpy(*str + strlen(*str), app, (strlen(app) + 1) * sizeof(char));
