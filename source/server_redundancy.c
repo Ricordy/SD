@@ -75,7 +75,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
 
                 int buffer_len = 1000;
                 printf("9.2.1 buffer_len:  %d \n", buffer_len);
-                char *buffer = malloc(1000 * sizeof(char));
+                char *buffer = malloc(1000);
                 if (buffer == NULL)
                 {
                     fprintf(stderr, "Erro, falha na reserva de memoria");
@@ -229,10 +229,11 @@ int server_zoo_setwatch(enum server_status *status)
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string)); // Lista de nós filhos do nó "/chain"
     if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
     {
+        free(children_list);
         printf("ERRO - Não foi possivel iniciar a watch\n");
         return -1;
     } // Obtém a lista de nós filhos
-
+    free(children_list);
     return 0;
 }
 
