@@ -17,6 +17,8 @@ struct server_net_t snet = {0};
 char *zkServerNodePath = NULL;
 char *zkServerNodeID = NULL;
 
+static char *watcher_ctx = "ZooKeeper Data Watcher";
+
 /**
  * Função de callback para monitorar o estado da conexão com o ZooKeeper
  */
@@ -43,6 +45,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
         if (type == ZOO_CHILD_EVENT)
         {
             enum server_status *local_server_status = watcher_ctx;
+            printf("9. status/watcher_ctx:  %s \n", watcher_ctx);
 
             if (!ZOK != zoo_wget_children(zh, "/chain", child_watcher, watcher_ctx, children_list))
             {
@@ -51,7 +54,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
 
             sortNodeIds(children_list);
             snet.proximo_node = getNextNode(children_list, zkServerNodeID);
-
+            printf("9.1 proximo node:  %s \n", snet.proximo_node);
             if (snet.proximo_node == NULL)
             {
                 if (snet.proximo_node_path != NULL)
@@ -63,6 +66,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             }
             else
             {
+                printf("9.2 proximo node:  %s \n", snet.proximo_node);
                 snet.proximo_node_path = malloc((7 + strlen(snet.proximo_node) + 1) * sizeof(char));
                 strcpy(snet.proximo_node_path, "/chain/");
                 strcat(snet.proximo_node_path, snet.proximo_node);
@@ -70,8 +74,9 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 printf("Next node path: %s\n", snet.proximo_node_path);
 
                 int buffer_len = 1000;
-                char *buffer = malloc(buffer_len);
-
+                printf("9.2.1 buffer_len:  %d \n", buffer_len);
+                char *buffer = malloc(1000);
+                printf("9.3");
                 if (ZOK != zoo_get(zh, snet.proximo_node_path, 0, buffer, &buffer_len, NULL))
                 {
                     printf("Não foi possiverl obter a metadata do node: %s\n", snet.proximo_node_path);
@@ -79,20 +84,24 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 }
                 if (snet.proximo_server_add != NULL)
                 {
+                    printf("9.3.1");
                     free(snet.proximo_server_add);
                 }
+                printf("9.3A");
                 snet.proximo_server_add = malloc(strlen(buffer));
                 strcpy(snet.proximo_server_add, buffer);
                 free(buffer);
-
+                printf("9.4");
                 // Conectar ao proximo node
                 if (snet.next_table == NULL)
                 {
+                    printf("9.4.1");
                     printf("A conectar ao proximo node... \n");
                     snet.next_table = rtable_connect(snet.proximo_server_add);
                 }
                 else
                 {
+                    printf("9.4.2");
                     char *str = malloc((strlen(snet.next_table->server_address) + 1 + strlen(snet.next_table->server_port) + 1) * sizeof(char));
                     strcpy(str, snet.next_table->server_address);
                     strcat(str, "");
@@ -109,17 +118,17 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                         printf("Proximo serviudor alterado, nova conexão feita! \n");
                     }
                 }
-                
-                
+                printf("9.5");
+
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
-                printf("Porto do proximo servidor %s\n", snet.next_table->server_port);
-                printf("Socket do proximo servidor %s\n", snet.next_table->sockfd);
+                printf("IP do proximo servidor %d\n", snet.next_table->server_address);
+                printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
+                printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
             }
             fprintf(stderr, "\n------------ Node em espera ------------\n");
             for (int i = 0; i < children_list->count; i++)
             {
-                fprintf(stderr, "Filho n %d, data: %s", i + 1, children_list->data[i]);
+                fprintf(stderr, "Filho n %d, data: %s \n", i + 1, children_list->data[i]);
             }
             fprintf(stderr, "\n------------ Feito ------------\n");
             // if (*local_server_status == SUCCESS && ZOK == zoo_exists(zh, "/chain/backup", 0, NULL))
@@ -211,7 +220,7 @@ int server_zoo_setwatch(enum server_status *status)
 
     printf("7\n");
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string)); // Lista de nós filhos do nó "/chain"
-    if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, status, children_list))
+    if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
     {
         printf("ERRO - Não foi possivel iniciar a watch\n");
         return -1;

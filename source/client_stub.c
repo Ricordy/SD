@@ -44,8 +44,8 @@ struct rtable_t *rtable_connect(char *address_port)
     {
 
         printf("IP do proximo servidor %s\n", tcp_table->server_address);
-        printf("Porto do proximo servidor %s\n", tcp_table->server_port);
-        printf("Socket do proximo servidor %s\n", tcp_table->sockfd);
+        printf("Porto do proximo servidor %d\n", tcp_table->server_port);
+        printf("Socket do proximo servidor %d\n", tcp_table->sockfd);
         return tcp_table; // Retornar estrutura conectada ao servidor
     }
 }
