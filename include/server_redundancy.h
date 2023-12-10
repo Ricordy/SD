@@ -7,6 +7,7 @@
 #ifndef _SERVER_REDUNDANCY_H
 #define _SERVER_REDUNDANCY_H
 
+#include "client_stub-private.h"
 #include <zookeeper/zookeeper.h>
 
 #define ZDATALEN 1024 * 1024
@@ -16,21 +17,29 @@ enum server_status
 {
     ERROR = -1,
     NONE,
-    PRIMARY_WITH_BACKUP,
-    PRIMARY_WITHOUT_BACKUP,
-    BACKUP,
+    SUCCESS,
     REPEAT
 };
 /*
 ERROR - Server retornou com erro
 NONE - Esta conexão será recusada pela three
-PRIMARY_WITH_BACKUP - Este servidor é primário e tem, um servidor backup, o pedido do cliente será reenviado
-PRIMARY_WITHOUT_BACKUP - Este servidor é primário e não tem servidor backup, o pedido do cliente será recusado
 BACKUP - Servidor de backup
 REPEAT - O servidor tentará registar-se novamente após um periodo definido
 */
 
-int server_zoo_init(const char *zoo_host);
+struct server_net_t
+{
+    char *zookeeper_add;
+    char *ip;
+    char *porta;
+    char *proximo_node;
+    char *proximo_node_path;
+    char *proximo_server_add;
+    struct rtable_t *next_table;
+}
+
+int
+server_zoo_init(const char *zoo_host);
 
 enum server_status server_zoo_register(const char *data, size_t datasize);
 

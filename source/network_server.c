@@ -94,10 +94,10 @@ void *handle_client(void *arg)
         struct timeval start, end; // Variaveis para armazenar o tempo de execução da operação
 
         // Verificar o OPCode da mensagem recebida para saber se a operção é executada localmente ou se é enviada para o servidor primário
-        if ((msg->opcode == MESSAGE_T__OPCODE__OP_DEL || msg->opcode == MESSAGE_T__OPCODE__OP_PUT) && server_status != BACKUP)
+        if ((msg->opcode == MESSAGE_T__OPCODE__OP_DEL || msg->opcode == MESSAGE_T__OPCODE__OP_PUT))
         {
             char *backup_address = malloc(DATAMAXLEN);
-            if (server_status == PRIMARY_WITH_BACKUP && server_zoo_get_backup(backup_address, DATAMAXLEN) != -1)
+            if (server_zoo_get_backup(backup_address, DATAMAXLEN) != -1)
             {
                 // Establecer conexão com o servidor de backup
                 struct rtable_t *rtable = rtable_connect(backup_address);
