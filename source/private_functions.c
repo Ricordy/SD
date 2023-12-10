@@ -80,3 +80,52 @@ void myIp(char **buffer)
 
     *buffer = inet_ntoa(*((struct in_addr *)host_entry->h_addr_list[0]));
 }
+
+void sortNodeIds(zoo_string *idList)
+{
+    int not_sorted = 1;
+    char *tmp;
+
+    while (not_sorted)
+    {
+        not_sorted = 0;
+        for (int i = 0; i < idList->count - 1; i++)
+        {
+            for (int j = i + 1; j < idList->count; j++)
+            {
+                if (strcmp(idList->data[i], idList->data[j]) > 0)
+                {
+                    not_sorted = 1;
+                    tmp = idList->data[j];
+                    idList->data[i] = idList->data[j];
+                    idList->data[j] = tmp;
+                }
+            }
+        }
+    }
+}
+
+char *getNextNode(zoo_string *idList, char *nodeId)
+{
+    for (int i = 0; i < idList->count; i++)
+    {
+        if (strcmp(idList->data[i], nodeId) == 0)
+        {
+            if (i == idList->count - 1)
+            {
+                // end of list
+                return NULL;
+            }
+            return idList->data[i + 1];
+        }
+    }
+    printf("Error: node id not found in list!\n");
+    printf("%s\n", nodeId);
+    printf("\n");
+    for (int i = 0; i < idList->count; i++)
+    {
+        printf("\n(%d): %s", i + 1, idList->data[i]);
+    }
+    printf("\n");
+    exit(EXIT_FAILURE);
+}
