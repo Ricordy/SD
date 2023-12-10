@@ -75,7 +75,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
 
                 int buffer_len = 1000;
                 printf("9.2.1 buffer_len:  %d \n", buffer_len);
-                char *buffer = malloc(1000);
+                char *buffer = malloc(1000 * sizeof(char));
                 if (buffer == NULL)
                 {
                     fprintf(stderr, "Erro, falha na reserva de memoria");
