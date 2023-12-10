@@ -13,6 +13,8 @@
         "stats.h": "c",
         "server_redundancy.h": "c",
         "private_functions.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "network_client.h": "c",
+        "client_stub-private.h": "c"
     }
 }

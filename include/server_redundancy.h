@@ -8,6 +8,7 @@
 #define _SERVER_REDUNDANCY_H
 
 #include "client_stub-private.h"
+#include "private_functions.h"
 #include <zookeeper/zookeeper.h>
 
 #define ZDATALEN 1024 * 1024
@@ -36,10 +37,9 @@ struct server_net_t
     char *proximo_node_path;
     char *proximo_server_add;
     struct rtable_t *next_table;
-}
+};
 
-int
-server_zoo_init(const char *zoo_host);
+int server_zoo_init(const char *zoo_host);
 
 enum server_status server_zoo_register(const char *data, size_t datasize);
 

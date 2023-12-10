@@ -19,7 +19,6 @@ int network_connect(struct rtable_t *rtable)
         fprintf(stderr, "rtable vazio.\n");
         return -1;
     }
-
     // informações do servidor
     rtable->socket.sin_family = AF_INET;                                          // Definiar Address Family (IPV4)
     rtable->socket.sin_port = htons(rtable->server_port);                         // Converter para network byte order (big-endian)
@@ -38,7 +37,7 @@ int network_connect(struct rtable_t *rtable)
         return -1;
     }
 
-    printf("Conectado ao servidor\n");
+    printf("Conectado ao servidor!\n");
 
     return 0;
 }
@@ -54,7 +53,6 @@ int network_connect(struct rtable_t *rtable)
  */
 MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 {
-
 
     int client_socket = rtable->sockfd;
     // Verificar se socket é válido
@@ -97,7 +95,6 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         free(message_buffer);
         return NULL;
     }
-
 
     response_size = ntohs(response_size);
     // Receção resposta

@@ -8,6 +8,8 @@
 
 #include "server_redundancy.h"
 
+typedef struct String_vector zoo_string;
+
 // appends a string to another
 void strappend(char **str, const char *app);
 
@@ -17,6 +19,6 @@ void myIp(char **buffer);
 
 void sortNodeIds(zoo_string *idList);
 
-char *getNextNode(zoo_string *idList, char *nodeId)
+char *getNextNode(zoo_string *idList, char *nodeId);
 
 #endif
