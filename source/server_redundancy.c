@@ -76,10 +76,16 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 int buffer_len = 1000;
                 printf("9.2.1 buffer_len:  %d \n", buffer_len);
                 char *buffer = malloc(1000);
+                if (buffer == NULL)
+                {
+                    fprintf(stderr, "Erro, falha na reserva de memoria");
+                    exit(1);
+                }
                 printf("9.3");
                 if (ZOK != zoo_get(zh, snet.proximo_node_path, 0, buffer, &buffer_len, NULL))
                 {
                     printf("Não foi possiverl obter a metadata do node: %s\n", snet.proximo_node_path);
+                    free(buffer);
                     exit(1);
                 }
                 if (snet.proximo_server_add != NULL)
