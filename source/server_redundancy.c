@@ -94,7 +94,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                     free(snet.proximo_server_add);
                 }
                 printf("9.3A");
-                snet.proximo_server_add = malloc(strlen(buffer));
+                snet.proximo_server_add = malloc(strlen(buffer) + 1);
                 strcpy(snet.proximo_server_add, buffer);
                 free(buffer);
                 printf("9.4");
@@ -127,7 +127,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 printf("9.5");
 
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                printf("IP do proximo servidor %d\n", snet.next_table->server_address);
+                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
                 printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
                 printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
             }
@@ -216,6 +216,7 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
     zkServerNodePath = new_path;
     zkServerNodeID = zkServerNodePath + 7;
     printf("Nó de sequencia efemera criado! Path do ZNode: %s\n", new_path);
+    free(new_path);
     return SUCCESS; // Registrado como "primary" com possibilidade de ter um "backup"
 }
 
