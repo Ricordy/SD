@@ -101,33 +101,37 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 free(buffer);
                 printf("9.4\n");
                 // Conectar ao proximo node
-                if (snet.next_table == NULL)
-                {
-                    printf("9.4.1\n");
-                    printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
-                    sleep(3);
-                    snet.next_table = rtable_connect(snet.proximo_server_add);
-                }
-                else
-                {
-                    printf("9.4.2\n");
-                    char *str = malloc((strlen(snet.next_table->server_address) + 1 + strlen(snet.next_table->server_port) + 1) * sizeof(char));
-                    strcpy(str, snet.next_table->server_address);
-                    strcat(str, "");
-                    strcat(str, snet.next_table->server_port);
-                    if (strcmp(str, snet.proximo_server_add) != 0)
-                    {
-                        if (snet.next_table != NULL)
-                        {
-                            free(snet.next_table->server_address);
-                            free(snet.next_table->server_port);
-                            free(snet.next_table);
-                        }
-                        sleep(3);
-                        snet.next_table = connect_zoo_server(remote_server_table, snet.proximo_server_add);
-                        printf("Proximo serviudor alterado, nova conexão feita! \n");
-                    }
-                }
+                printf("9.4.1\n");
+                printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
+                sleep(3);
+                snet.next_table = rtable_connect(snet.proximo_server_add);
+                // if (snet.next_table == NULL)
+                // {
+                //     printf("9.4.1\n");
+                //     printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
+                //     sleep(3);
+                //     snet.next_table = rtable_connect(snet.proximo_server_add);
+                // }
+                // else
+                // {
+                //     printf("9.4.2\n");
+                //     char *str = malloc((strlen(snet.next_table->server_address) + 1 + strlen(snet.next_table->server_port) + 1) * sizeof(char));
+                //     strcpy(str, snet.next_table->server_address);
+                //     strcat(str, "");
+                //     strcat(str, snet.next_table->server_port);
+                //     if (strcmp(str, snet.proximo_server_add) != 0)
+                //     {
+                //         if (snet.next_table != NULL)
+                //         {
+                //             free(snet.next_table->server_address);
+                //             free(snet.next_table->server_port);
+                //             free(snet.next_table);
+                //         }
+                //         sleep(3);
+                //         snet.next_table = connect_zoo_server(&remote_server_table, snet.proximo_server_add);
+                //         printf("Proximo serviudor alterado, nova conexão feita! \n");
+                //     }
+                // }
                 printf("9.5\n");
 
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
