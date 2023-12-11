@@ -11,13 +11,17 @@
 #include "inet.h"
 #include "stats.h"
 
+#include <zookeeper/zookeeper.h>
+
+typedef struct String_vector zoo_string;
+
 char *zookeeperAddress;
 static zhandle_t *zh;
 static int is_connected;
 static char *watcher_ctx = "ZooKeeper Data Watcher";
 
 char *head_address = NULL, *tail_address = NULL;
-struct rtree_t *rtable_head = NULL, *rtable_tail = NULL;
+struct rtable_t *rtable_head = NULL, *rtable_tail = NULL;
 
 void sortNodeIds(zoo_string *idList)
 {
@@ -112,8 +116,8 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             else
             {
                 free(head_address);
-                free(rtable_head->ip_address);
-                free(rtable_head->port);
+                free(rtable_head->server_address);
+                free(rtable_head->server_port);
                 free(rtable_head);
                 head_address = strdup(new_head_address);
                 rtable_head = rtable_connect(head_address);
@@ -134,8 +138,8 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             else
             {
                 free(tail_address);
-                free(rtable_tail->ip_address);
-                free(rtable_tail->port);
+                free(rtable_tail->server_address);
+                free(rtable_tail->server_port);
                 free(rtable_tail);
                 tail_address = strdup(new_tail_address);
                 rtable_tail = rtable_connect(tail_address);
@@ -175,10 +179,11 @@ int main(int argc, char **argv)
         return -1;
     }
     // setup connection to zookeeper
+    zookeeperAddress = argv[1];
     zh = zookeeper_init(zookeeperAddress, connection_watcher, 2000, 0, 0, 0);
     if (zh == NULL)
     {
-        fprintf(stderr, "Error connecting to ZooKeeper server[%d]!\n", errno);
+        fprintf(stderr, "Error connecting to ZooKeeper server!\n");
         exit(EXIT_FAILURE);
     }
     sleep(3); /* Sleep a little for connection to complete */
@@ -206,8 +211,8 @@ int main(int argc, char **argv)
         else
         {
             free(head_address);
-            free(rtable_head->ip_address);
-            free(rtable_head->port);
+            free(rtable_head->server_address);
+            free(rtable_head->server_port);
             free(rtable_head);
             head_address = strdup(new_head_address);
             rtable_head = rtable_connect(head_address);
@@ -228,8 +233,8 @@ int main(int argc, char **argv)
         else
         {
             free(tail_address);
-            free(rtable_tail->ip_address);
-            free(rtable_tail->port);
+            free(rtable_tail->server_address);
+            free(rtable_tail->server_port);
             free(rtable_tail);
             tail_address = strdup(new_tail_address);
             rtable_tail = rtable_connect(tail_address);
