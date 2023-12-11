@@ -16,10 +16,10 @@ out: sdmessage libtable message.o private_functions.o server_redundancy.o stats.
 
 
 table_client: $(OBJ)/table_client.o $(OBJ)/message.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o
-	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt
+	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt -D THREADED
 
 table_server:  $(OBJ)/network_server.o $(OBJ)/table_server.o $(OBJ)/message.o $(OBJ)/stats.o $(OBJS)/data.o $(OBJS)/entry.o $(OBJS)/list.o $(OBJS)/table.o $(OBJ)/sdmessage.o $(OBJ)/table_skel.o $(OBJ)/server_redundancy.o $(OBJ)/client_stub.o $(OBJ)/network_client.o $(OBJ)/private_functions.o
-	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt 
+	$(CC) $(CFLAGS) -o $(BIN)/$@ $^ -lprotobuf-c -lzookeeper_mt -D THREADED
 
 libtable: $(LIB)/libtable.a
 

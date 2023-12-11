@@ -44,12 +44,12 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
     {
         if (type == ZOO_CHILD_EVENT)
         {
-            enum server_status *local_server_status = watcher_ctx;
             printf("9. status/watcher_ctx:  %s \n", watcher_ctx);
 
-            if (!ZOK != zoo_wget_children(zh, "/chain", child_watcher, watcher_ctx, children_list))
+            if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
             {
                 fprintf(stderr, "Erro a configurar watch no %s!\n", "/chain");
+                exit(1);
             }
 
             sortNodeIds(children_list);
@@ -170,7 +170,7 @@ int server_zoo_init(const char *zoo_host)
 
     printf("ZNONODE: %d  %d %d  \n", ZNONODE, ZOK, ZOO_CONNECTED_STATE);
 
-    sleep(3); // Aguarda 2 segundos para a conexão ser estabelecida
+    sleep(4); // Aguarda 2 segundos para a conexão ser estabelecida
 
     if (ZNONODE == zoo_exists(zh, "/chain", 0, NULL))
     {
@@ -201,16 +201,25 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
     }
     int path_len = 1024;
     char *new_path = malloc(path_len);
+    if (new_path == NULL)
+    {
+        printf("Erro - Não fpoi possivel reservar a memoria.\n");
+        return ERROR;
+    }
     printf("A criar child node /chain/node... \n");
     fflush(stdout);
 
     printf("6.\n");
+    printf("6.1 data/this_ip_port:  %s\n", data);
 
-    printf("6.2\n");
-
-    if (ZOK != zoo_create(zh, "/chain/node", data, datasize, &ZOO_OPEN_ACL_UNSAFE, 3, new_path, path_len))
+    printf("6.2 ZOK: %d\n", ZOK);
+    int zoo_status = zoo_create(zh, "/chain/node", data, datasize, &ZOO_OPEN_ACL_UNSAFE, 2 | 3, new_path, path_len);
+    sleep(2);
+    if (ZOK != zoo_status)
     {
-        printf("Erro - Não foi possivel criar o node primario no zookeeper.");
+        if (ZNONODE == zoo_status)
+            printf("ZNONDE!\n");
+        fprintf(stderr, "Erro - Não foi possivel criar o node no zookeeper. Error code: %d %d\n", ZOK, zoo_status);
         return ERROR;
     }
     zkServerNodePath = new_path;
@@ -227,7 +236,7 @@ int server_zoo_setwatch(enum server_status *status)
 
     printf("7\n");
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string)); // Lista de nós filhos do nó "/chain"
-    if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
+    if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, status, children_list))
     {
         free(children_list);
         printf("ERRO - Não foi possivel iniciar a watch\n");

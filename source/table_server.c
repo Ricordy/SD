@@ -34,17 +34,17 @@ int main(int argc, char **argv)
 
     signal(SIGINT, termination_handler); // Registra o manipulador para SIGINT
 
-    //Obtem o endereço IP da maquina local
+    // Obtem o endereço IP da maquina local
     char *address;
     myIp(&address);
     printf("2.\n");
 
-    //Copia dinamica do endereço de ip mais porta
+    // Copia dinamica do endereço de ip mais porta
     char *heap = malloc((strlen(address) + 1) * sizeof(char));
     memcpy(heap, address, (strlen(address) + 1) * sizeof(char));
     strappend(&heap, ":");
     strappend(&heap, argv[1]);
-    
+
     printf("3.\n");
     do
     {
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     } while (server_status == REPEAT);
 
     printf("4.\n");
-    free(heap);
+    // free(heap);
     server_zoo_setwatch(&server_status);
     printf("5. server_status:  %d\n", server_status);
     if (server_status != NONE && server_status != ERROR)
