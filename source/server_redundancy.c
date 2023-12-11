@@ -18,7 +18,7 @@ char *zkServerNodePath = NULL;
 char *zkServerNodeID = NULL;
 
 static char *watcher_ctx = "ZooKeeper Data Watcher";
-extern struct table_t *server_table;
+struct rtable_t *remote_server_table;
 
 /**
  * Função de callback para monitorar o estado da conexão com o ZooKeeper
@@ -31,7 +31,6 @@ void connection_watcher(zhandle_t *zh, int type, int state, const char *path, vo
         {
             is_connected = 1; // A conexão com o ZooKeeper foi estabelecida
         }
-        struct table_t *server_table;
         else
         {
             is_connected = 0; // A conexão com o ZooKeeper foi perdida
@@ -123,14 +122,14 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                             free(snet.next_table->server_port);
                             free(snet.next_table);
                         }
-                        snet.next_table = rtable_connect(snet.proximo_server_add);
+                        snet.next_table = connect_zoo_server(remote_server_table, snet.proximo_server_add);
                         printf("Proximo serviudor alterado, nova conexão feita! \n");
                     }
                 }
                 printf("9.5\n");
 
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                printf("IP do proximo servidor %d\n", snet.next_table->server_address);
+                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
                 printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
                 printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
             }
@@ -263,23 +262,24 @@ int server_zoo_setwatch(enum server_status *status)
     return 0;
 }
 
-int connect_zoo_server(struct rtree_t *server, char *serverInfo)
+int connect_zoo_server(struct rtable_t *server, char *serverInfo)
 {
-    // printf("SERVER INFO: %s\n\n", serverInfo);
-    // VERIFICAR SE FUNCIONA
+
+    server = malloc(sizeof(struct rtable_t));
+    printf("SERVER INFO: %s\n\n", serverInfo);
     char *host = strtok((char *)serverInfo, ":"); // hostname    removed:
     int port = atoi(strtok(NULL, ":"));           // port      '<' ':' '>'
-
-    server->server_socket.sin_family = AF_INET;
-    server->server_socket.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, host, &server->server_socket.sin_addr) < 1)
+    printf("9.4.1.1 port: %s\n", port);
+    server->socket.sin_family = AF_INET;
+    server->socket.sin_port = htons(port);
+    printf("9.4.1.2\n");
+    if (inet_pton(AF_INET, host, &server->socket.sin_addr) < 1)
     {
         printf("Erro ao converter IP\n");
         return -1;
     }
     // Criar socket TCP
-    if ((server->socket_num = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    if ((server->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         perror("Erro ao criar socket TCP - Cliente");
         exit(1);
@@ -287,10 +287,10 @@ int connect_zoo_server(struct rtree_t *server, char *serverInfo)
     // printf("SOCKET NUMBER: %d\n\n\n", server->socket_num);
 
     // Estabelece conexao com o servidor
-    if (connect(server->socket_num, (struct sockaddr *)&server->server_socket, sizeof(server->server_socket)) < 0)
+    if (connect(server->sockfd, (struct sockaddr *)&server->socket, sizeof(server->socket)) < 0)
     {
         perror("Erro ao conetar ao servidor - Client");
-        close(server->socket_num);
+        close(server->sockfd);
         exit(1);
     }
 
