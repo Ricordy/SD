@@ -105,6 +105,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 {
                     printf("9.4.1\n");
                     printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
+                    sleep(3);
                     snet.next_table = rtable_connect(snet.proximo_server_add);
                 }
                 else
@@ -122,6 +123,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                             free(snet.next_table->server_port);
                             free(snet.next_table);
                         }
+                        sleep(3);
                         snet.next_table = connect_zoo_server(remote_server_table, snet.proximo_server_add);
                         printf("Proximo serviudor alterado, nova conexão feita! \n");
                     }
@@ -172,7 +174,7 @@ int server_zoo_init(const char *zoo_host)
 
     printf("ZNONODE: %d  %d %d  \n", ZNONODE, ZOK, ZOO_CONNECTED_STATE);
 
-    sleep(4); // Aguarda 2 segundos para a conexão ser estabelecida
+    sleep(2); // Aguarda 2 segundos para a conexão ser estabelecida
 
     if (ZNONODE == zoo_exists(zh, "/chain", 0, NULL))
     {
@@ -201,7 +203,7 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
         printf("Não está conectado ao zookeeper, não foi possivel inicar o node.\n");
         return ERROR; // Não está conectado ao ZooKeeper
     }
-    sleep(4); // Aguarda 2 segundos para a conexão ser estabelecida
+    sleep(2); // Aguarda 2 segundos para a conexão ser estabelecida
 
     if (ZNONODE == zoo_exists(zh, "/chain", 0, NULL))
     {

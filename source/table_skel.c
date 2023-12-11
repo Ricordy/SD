@@ -1,9 +1,12 @@
 #include "table.h"
+#include "entry.h"
 #include "inet.h"
 #include "sdmessage.pb-c.h"
+#include "server_redundancy.h"
 #include "stats.h"
 
 extern struct statistics_t server_stats; // Estatísticas globais do servidor
+extern struct server_net_t snet;
 
 /* Inicia o skeleton da tabela.
  * O main() do servidor deve chamar esta função antes de poder usar a
@@ -114,6 +117,7 @@ int invoke(MessageT *msg, struct table_t *table)
     }
     else if (operacao == MESSAGE_T__OPCODE__OP_PUT)
     {
+        printf("Efetuar operção put..... \n");
         // Operação de inserção ou atualização de um valor na tabela
         msg->opcode += 1;
         msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
@@ -125,6 +129,18 @@ int invoke(MessageT *msg, struct table_t *table)
 
             msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
             return -1;
+        }
+        if (snet.next_table == NULL)
+        {
+            printf("Efetuar opre entry create.... \n");
+            struct entry_t *entry = entry_create(msg->key, dataTemp);
+            printf("Efetuar pre rtable_put %s\n", snet.next_table->server_address);
+            if ((rtable_put(snet.next_table, entry)) == -1)
+            {
+                printf("Erro ao enviar ao proximo servidor");
+            }
+            printf("pre destory..... \n");
+            entry_destroy(entry);
         }
         return 0;
     }

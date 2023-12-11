@@ -58,7 +58,7 @@ table_client.o: $(SRC)/table_client.c $(INCLUDE)/client_stub.h  $(INCLUDE)/netwo
 table_server.o: $(SRC)/table_server.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/network_server.h $(INCLUDE)/message-private.h $(INCLUDE)/sdmessage.pb-c.h $(INCLUDE)/server_redundancy.h $(INCLUDE)/private_functions.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
-table_skel.o: $(SRC)/table_skel.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/sdmessage.pb-c.h
+table_skel.o: $(SRC)/table_skel.c $(SRC)/stats.c $(INCLUDE)/table_skel.h  $(INCLUDE)/sdmessage.pb-c.h $(INCLUDE)/server_redundancy.h $(INCLUDE)/entry.h
 	$(CC) -c $(CFLAGS) $< -o $(OBJ)/$@
 
 network_client.o: $(SRC)/network_client.c $(INCLUDE)/network_client.h 
