@@ -45,7 +45,6 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
     {
         if (type == ZOO_CHILD_EVENT)
         {
-            printf("9. status/watcher_ctx:  %s \n", watcher_ctx);
 
             if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
             {
@@ -56,7 +55,6 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             sortNodeIds(children_list);
             printf("nodeId pré chamada: %s\n", zkServerNodeID);
             snet.proximo_node = getNextNode(children_list, zkServerNodeID);
-            printf("9.1 proximo node:  %s \n", snet.proximo_node);
             if (snet.proximo_node == NULL)
             {
                 if (snet.proximo_node_path != NULL)
@@ -64,11 +62,10 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                     free(snet.proximo_node_path);
                 }
                 snet.proximo_node_path = NULL;
-                printf("PRoximo nó: Nó final.");
+                printf("Proximo nó: Nó final.");
             }
             else
             {
-                printf("9.2 proximo node:  %s \n", snet.proximo_node);
                 snet.proximo_node_path = malloc((7 + strlen(snet.proximo_node) + 1) * sizeof(char));
                 strcpy(snet.proximo_node_path, "/chain/");
                 strcat(snet.proximo_node_path, snet.proximo_node);
@@ -76,14 +73,12 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 printf("Next node path: %s\n", snet.proximo_node_path);
 
                 int buffer_len = 1000;
-                printf("9.2.1 buffer_len:  %d \n", buffer_len);
                 char *buffer = malloc(1000);
                 if (buffer == NULL)
                 {
                     fprintf(stderr, "Erro, falha na reserva de memoria");
                     exit(1);
                 }
-                printf("9.3 \n");
                 if (ZOK != zoo_get(zh, snet.proximo_node_path, 0, buffer, &buffer_len, NULL))
                 {
                     printf("Não foi possiverl obter a metadata do node: %s\n", snet.proximo_node_path);
@@ -92,16 +87,13 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 }
                 if (snet.proximo_server_add != NULL)
                 {
-                    printf("9.3.1\n");
                     free(snet.proximo_server_add);
                 }
-                printf("9.3A\n");
                 snet.proximo_server_add = malloc(strlen(buffer) + 1);
                 strcpy(snet.proximo_server_add, buffer);
                 free(buffer);
-                printf("9.4\n");
                 // Conectar ao proximo node
-                printf("9.4.1\n");
+
                 printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
                 sleep(3);
                 snet.next_table = rtable_connect(snet.proximo_server_add);
@@ -132,12 +124,11 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 //         printf("Proximo serviudor alterado, nova conexão feita! \n");
                 //     }
                 // }
-                printf("9.5\n");
 
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                // printf("IP do proximo servidor %s\n", snet.next_table->server_address);
-                // printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
-                // printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
+                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
+                printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
+                printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
             }
             fprintf(stderr, "\n------------ Node em espera ------------\n");
             for (int i = 0; i < children_list->count; i++)
@@ -230,10 +221,6 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
     printf("A criar child node /chain/node... \n");
     fflush(stdout);
 
-    printf("6.\n");
-    printf("6.1 data/this_ip_port:  %s\n", data);
-
-    printf("6.2 ZOK: %d\n", ZOK);
     int zoo_status = zoo_create(zh, "/chain/node", data, datasize, &ZOO_OPEN_ACL_UNSAFE, ZOO_EPHEMERAL | ZOO_SEQUENCE, new_path, path_len);
     sleep(2);
     if (ZOK != zoo_status)
@@ -256,7 +243,6 @@ int server_zoo_setwatch(enum server_status *status)
     if (!is_connected)
         return -1;
 
-    printf("7\n");
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string)); // Lista de nós filhos do nó "/chain"
     if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
     {
@@ -274,26 +260,19 @@ int connect_zoo_server(struct rtable_t *server, char *serverInfo)
     printf("SERVER INFO: %s\n\n", serverInfo);
     // char *host = strtok((char *)serverInfo, ":"); // hostname    removed:
     // int port = atoi(strtok(NULL, ":"));           // port      '<' ':' '>'
-    printf("9.4.1.1 \n");
     for (int i = 0; i < strlen(serverInfo); i++) // Percorrer o array de char fornecido
     {
         if (serverInfo[i] == ':') // quando encontramos a divisão ip:porto
         {
-            printf("9.4.1.1.1 \n");
-            server->server_port = atoi(serverInfo + i + 1);
-            printf("9.4.1.1.1 port done \n");                        // Converter a string relativa ao porto
+            server->server_port = atoi(serverInfo + i + 1);                      // Converter a string relativa ao porto
             server->server_address = malloc(sizeof(char) * (i + 1)); // Reservar o espaço necessário para o ip do servidor
-            printf("9.4.1.1.2 \n");
             memcpy(server->server_address, serverInfo, sizeof(char) * (i + 1)); // copiar o valor do ip para a o endereço da memoria que definimos anteriormente
             ((char *)server->server_address)[i] = '\0';
-            printf("9.4.1.1.3 \n");
             server->socket.sin_family = AF_INET;
             server->socket.sin_port = htons(server->server_port); // Colocar o caracter de fim de string
-            printf("9.4.1.1.4 \n");
         }
     }
 
-    printf("9.4.1.2\n");
     if (inet_pton(AF_INET, server->server_address, &server->socket.sin_addr) < 1)
     {
         printf("Erro ao converter IP\n");
