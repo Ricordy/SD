@@ -125,9 +125,9 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 // }
                 printf("\n");
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
-                printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
-                printf("Socket do proximo servidor %d\n\n", snet.next_table->sockfd);
+                //printf("IP do proximo servidor %s\n", snet.next_table->server_address);
+                //printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
+                //printf("Socket do proximo servidor %d\n\n", snet.next_table->sockfd);
             }
             fprintf(stderr, "\n------------ Node em espera ------------\n");
             for (int i = 0; i < children_list->count; i++)
@@ -135,10 +135,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 fprintf(stderr, "Filho n %d, data: %s \n", i + 1, children_list->data[i]);
             }
             fprintf(stderr, "\n------------ Feito ------------\n");
-            // if (*local_server_status == SUCCESS && ZOK == zoo_exists(zh, "/chain/backup", 0, NULL))
-            // {
-            //     *local_server_status = SUCCESS;
-            // }
+
         }
     }
     free(children_list);
@@ -235,7 +232,7 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
     printf("Nó de sequencia efemera criado! Path do ZNode: %s\n", new_path);
     // free(new_path);
 
-    return SUCCESS; // Registrado como "primary" com possibilidade de ter um "backup"
+    return SUCCESS;
 }
 
 int server_zoo_setwatch(enum server_status *status)
@@ -301,32 +298,6 @@ int connect_zoo_server(struct rtable_t *server, char *serverInfo)
     printf("Conetado ao próximo servidor\n");
 
     return 0;
-}
-
-int server_zoo_get_primary(char *meta_data, int size)
-{
-    if (!is_connected)
-        return -1;
-    memset(meta_data, 0, size);
-    if (ZOK != zoo_get(zh, "/chain/node", 0, meta_data, &size, NULL))
-    {
-        printf("Error! - Couldn't get data at primary in zookeeper");
-        return -1;
-    }
-    return size;
-}
-
-int server_zoo_get_backup(char *meta_data, int size)
-{
-    if (!is_connected)
-        return -1;
-    memset(meta_data, 0, size);
-    if (ZOK != zoo_get(zh, "/chain/node", 0, meta_data, &size, NULL))
-    {
-        printf("Error! - Couldn't get data at backup in zookeeper");
-        return -1;
-    }
-    return size;
 }
 
 void server_zoo_close()
