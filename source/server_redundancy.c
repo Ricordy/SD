@@ -18,6 +18,7 @@ char *zkServerNodePath = NULL;
 char *zkServerNodeID = NULL;
 
 static char *watcher_ctx = "ZooKeeper Data Watcher";
+extern struct table_t *server_table;
 
 /**
  * Função de callback para monitorar o estado da conexão com o ZooKeeper
@@ -30,6 +31,7 @@ void connection_watcher(zhandle_t *zh, int type, int state, const char *path, vo
         {
             is_connected = 1; // A conexão com o ZooKeeper foi estabelecida
         }
+        struct table_t *server_table;
         else
         {
             is_connected = 0; // A conexão com o ZooKeeper foi perdida
@@ -53,6 +55,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             }
 
             sortNodeIds(children_list);
+            printf("nodeId pré chamada: %s\n", zkServerNodeID);
             snet.proximo_node = getNextNode(children_list, zkServerNodeID);
             printf("9.1 proximo node:  %s \n", snet.proximo_node);
             if (snet.proximo_node == NULL)
@@ -81,7 +84,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                     fprintf(stderr, "Erro, falha na reserva de memoria");
                     exit(1);
                 }
-                printf("9.3");
+                printf("9.3 \n");
                 if (ZOK != zoo_get(zh, snet.proximo_node_path, 0, buffer, &buffer_len, NULL))
                 {
                     printf("Não foi possiverl obter a metadata do node: %s\n", snet.proximo_node_path);
@@ -90,24 +93,24 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 }
                 if (snet.proximo_server_add != NULL)
                 {
-                    printf("9.3.1");
+                    printf("9.3.1\n");
                     free(snet.proximo_server_add);
                 }
-                printf("9.3A");
+                printf("9.3A\n");
                 snet.proximo_server_add = malloc(strlen(buffer) + 1);
                 strcpy(snet.proximo_server_add, buffer);
                 free(buffer);
-                printf("9.4");
+                printf("9.4\n");
                 // Conectar ao proximo node
                 if (snet.next_table == NULL)
                 {
-                    printf("9.4.1");
-                    printf("A conectar ao proximo node... \n");
+                    printf("9.4.1\n");
+                    printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
                     snet.next_table = rtable_connect(snet.proximo_server_add);
                 }
                 else
                 {
-                    printf("9.4.2");
+                    printf("9.4.2\n");
                     char *str = malloc((strlen(snet.next_table->server_address) + 1 + strlen(snet.next_table->server_port) + 1) * sizeof(char));
                     strcpy(str, snet.next_table->server_address);
                     strcat(str, "");
@@ -124,10 +127,10 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                         printf("Proximo serviudor alterado, nova conexão feita! \n");
                     }
                 }
-                printf("9.5");
+                printf("9.5\n");
 
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
+                printf("IP do proximo servidor %d\n", snet.next_table->server_address);
                 printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
                 printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
             }
@@ -176,7 +179,7 @@ int server_zoo_init(const char *zoo_host)
     {
         fprintf(stderr, "/chain não existe, a criar...\n");
         fflush(stderr);
-        if (ZOK != zoo_create(zh, "/chain", "chain node", 11, &ZOO_OPEN_ACL_UNSAFE, 2, NULL, 0))
+        if (ZOK != zoo_create(zh, "/chain", NULL, -1, &ZOO_OPEN_ACL_UNSAFE, 0, NULL, 0))
         {
             perror("Error- Não consegui inicializar o zookeper");
             return -1;
@@ -199,6 +202,19 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
         printf("Não está conectado ao zookeeper, não foi possivel inicar o node.\n");
         return ERROR; // Não está conectado ao ZooKeeper
     }
+    sleep(4); // Aguarda 2 segundos para a conexão ser estabelecida
+
+    if (ZNONODE == zoo_exists(zh, "/chain", 0, NULL))
+    {
+        fprintf(stderr, "/chain não existe, a criar...\n");
+        fflush(stderr);
+        if (ZOK != zoo_create(zh, "/chain", NULL, -1, &ZOO_OPEN_ACL_UNSAFE, 0, NULL, 0))
+        {
+            perror("Error- Não consegui inicializar o zookeper");
+            return -1;
+        }
+    }
+
     int path_len = 1024;
     char *new_path = malloc(path_len);
     if (new_path == NULL)
@@ -213,7 +229,7 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
     printf("6.1 data/this_ip_port:  %s\n", data);
 
     printf("6.2 ZOK: %d\n", ZOK);
-    int zoo_status = zoo_create(zh, "/chain/node", data, datasize, &ZOO_OPEN_ACL_UNSAFE, 2 | 3, new_path, path_len);
+    int zoo_status = zoo_create(zh, "/chain/node", data, datasize, &ZOO_OPEN_ACL_UNSAFE, ZOO_EPHEMERAL | ZOO_SEQUENCE, new_path, path_len);
     sleep(2);
     if (ZOK != zoo_status)
     {
@@ -223,9 +239,10 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
         return ERROR;
     }
     zkServerNodePath = new_path;
-    zkServerNodeID = zkServerNodePath + 7;
+    zkServerNodeID = zkServerNodePath + strlen("/chain/");
     printf("Nó de sequencia efemera criado! Path do ZNode: %s\n", new_path);
-    free(new_path);
+    // free(new_path);
+
     return SUCCESS; // Registrado como "primary" com possibilidade de ter um "backup"
 }
 
@@ -236,7 +253,7 @@ int server_zoo_setwatch(enum server_status *status)
 
     printf("7\n");
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string)); // Lista de nós filhos do nó "/chain"
-    if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, status, children_list))
+    if (ZOK != zoo_wget_children(zh, "/chain", &child_watcher, watcher_ctx, children_list))
     {
         free(children_list);
         printf("ERRO - Não foi possivel iniciar a watch\n");

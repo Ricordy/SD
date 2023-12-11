@@ -107,6 +107,10 @@ void sortNodeIds(zoo_string *idList)
 
 char *getNextNode(zoo_string *idList, char *nodeId)
 {
+    printf("Arguments:\n");
+    printf("idList->count: %d\n", idList->count);
+    printf("nodeId: %s\n", nodeId);
+
     for (int i = 0; i < idList->count; i++)
     {
         if (strcmp(idList->data[i], nodeId) == 0)
@@ -114,17 +118,23 @@ char *getNextNode(zoo_string *idList, char *nodeId)
             if (i == idList->count - 1)
             {
                 // end of list
+                printf("End of list reached. Returning NULL.\n");
                 return NULL;
             }
+
+            printf("Node found in the list. Returning the next node.\n");
+            printf("Next node: %s\n", idList->data[i + 1]);
             return idList->data[i + 1];
         }
     }
-    printf("Error: node id not found in list!\n");
-    printf("%s\n", nodeId);
-    printf("\n");
+
+    // Node not found in the list
+    printf("Error: Node id not found in the list!\n");
+    printf("Node Id: %s\n", nodeId);
+    printf("\nList Contents:\n");
     for (int i = 0; i < idList->count; i++)
     {
-        printf("\n(%d): %s", i + 1, idList->data[i]);
+        printf("(%d): %s\n", i + 1, idList->data[i]);
     }
     printf("\n");
     exit(EXIT_FAILURE);
