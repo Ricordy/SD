@@ -105,7 +105,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 {
                     printf("9.4.1\n");
                     printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
-                    snet.next_table = connect_zoo_server(remote_server_table, snet.proximo_server_add);
+                    snet.next_table = rtable_connect(snet.proximo_server_add);
                 }
                 else
                 {
@@ -129,9 +129,9 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 printf("9.5\n");
 
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
-                printf("IP do proximo servidor %s\n", snet.next_table->server_address);
-                printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
-                printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
+                // printf("IP do proximo servidor %s\n", snet.next_table->server_address);
+                // printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
+                // printf("Socket do proximo servidor %d\n", snet.next_table->sockfd);
             }
             fprintf(stderr, "\n------------ Node em espera ------------\n");
             for (int i = 0; i < children_list->count; i++)
