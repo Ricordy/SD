@@ -123,7 +123,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 //         printf("Proximo serviudor alterado, nova conexão feita! \n");
                 //     }
                 // }
-                printf("\n")
+                printf("\n");
                 printf("Endereço do proximo servidor %s\n", snet.proximo_server_add);
                 printf("IP do proximo servidor %s\n", snet.next_table->server_address);
                 printf("Porto do proximo servidor %d\n", snet.next_table->server_port);
