@@ -122,8 +122,8 @@ char *getNextNode(zoo_string *idList, char *nodeId)
                 return NULL;
             }
 
-            printf("Node found in the list. Returning the next node.\n");
-            printf("Next node: %s\n", idList->data[i + 1]);
+            //printf("Node found in the list. Returning the next node.\n");
+            //printf("Next node: %s\n", idList->data[i + 1]);
             return idList->data[i + 1];
         }
     }

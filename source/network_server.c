@@ -73,7 +73,7 @@ int network_server_init(short port)
 
 void *handle_client(void *arg)
 {
-    printf("5.4.3.1 Handling client.\n");
+    printf("Handling client.\n");
     if (pthread_detach(pthread_self()) != 0)
     {
         perror("Erro ao fazer detach da thread");
@@ -91,7 +91,6 @@ void *handle_client(void *arg)
 
     while (1)
     {
-        printf("5.4.3.2\n");
         // Receber a mensagem do cliente
         msg = network_receive(connsockfd);
         if (msg == NULL)
@@ -100,7 +99,6 @@ void *handle_client(void *arg)
             return (void *)-1;
             // break;
         }
-        printf("5.4.3.3\n");
         // Executa a operação enviada pelo cliente
         pthread_mutex_lock(&table_mutex);
         // Iniciar contagem de tempo da operação recorrendo a função gettimeofday
@@ -152,12 +150,12 @@ void *handle_client(void *arg)
  */
 int network_main_loop(int listening_socket, struct table_t *table)
 {
+    printf("A aguardar conexões de clientes...\n\n");
     int connsockfd;       // Variavel para armazenar o descritor do socket
     MessageT *msg = NULL; // Variavel mensagem iniciada a NULL para evitar "lixo" na memória
 
     while (1) // Lidar com a conexão do cliente após esta ser aceite
     {
-        printf("5.4.1\n");
         connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client);
         if (connsockfd < 0) // Verificação do socket recebido pela função accept
         {
@@ -174,7 +172,6 @@ int network_main_loop(int listening_socket, struct table_t *table)
             continue;
             // return -1;
         }
-        printf("5.4.3\n");
 
         argumentos->args = connsockfd;
         argumentos->tabela = table;
@@ -242,7 +239,6 @@ MessageT *network_receive(int client_socket)
     // Deserializa a mensagem
     MessageT *msgRecebida = (struct _MessageT *)message_t__unpack(NULL, size, buf);
     free(buf);
-    printf("mensagem aqui.... \n");
     printf("Mensagem recebida, key: %s \n", msgRecebida->key);
     // Verifica se a deserialização foi bem-sucedida
     if (msgRecebida == NULL)
@@ -305,6 +301,8 @@ int network_send(int client_socket, MessageT *msg)
 
     // Libetar a memoria do buffer
     free(buf);
+
+    printf("Mensagem enviada.\n");
 
     return 0; // Retorna 0 em caso de sucesso
 }
