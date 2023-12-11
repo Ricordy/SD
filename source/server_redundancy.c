@@ -192,7 +192,7 @@ int server_zoo_init(const char *zoo_host)
  */
 enum server_status server_zoo_register(const char *data, size_t datasize)
 {
-    printf("A registar servidor no ZooKeeper...\n");
+    printf("\n/// --- A registar servidor no ZooKeeper... --- ///\n");
     if (!is_connected)
     {
         printf("Não está conectado ao zookeeper, não foi possivel inicar o node.\n");

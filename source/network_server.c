@@ -73,7 +73,7 @@ int network_server_init(short port)
 
 void *handle_client(void *arg)
 {
-    printf("Handling client.\n");
+    printf("\nHandling client.\n");
     if (pthread_detach(pthread_self()) != 0)
     {
         perror("Erro ao fazer detach da thread");
@@ -162,7 +162,6 @@ int network_main_loop(int listening_socket, struct table_t *table)
             perror("Error no accept!\n");
             return -1;
         }
-        printf("5.4.2\n");
 
         // Criação de uma estrutura para armazenar os argumentos
         struct u_args *argumentos = (struct u_args *)malloc(sizeof(struct u_args));

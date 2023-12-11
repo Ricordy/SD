@@ -46,7 +46,7 @@ int table_skel_destroy(struct table_t *table)
  */
 int invoke(MessageT *msg, struct table_t *table)
 {
-    printf("Entrei invoke \n");
+
     if (table == NULL || msg == NULL)
     {
         return -1; // Erro, tabela ou mensagem nulos
@@ -94,7 +94,6 @@ int invoke(MessageT *msg, struct table_t *table)
     }
     else if (operacao == MESSAGE_T__OPCODE__OP_GET)
     {
-        printf("Entrei no get na função invoke... \n");
         // Operação de encontrar um valor da tabela
         msg->opcode += 1;
         msg->c_type = MESSAGE_T__C_TYPE__CT_VALUE;
@@ -102,7 +101,6 @@ int invoke(MessageT *msg, struct table_t *table)
 
         if (conteudo == MESSAGE_T__C_TYPE__CT_KEY)
         {
-            printf("Conterudo certo, a efetuar table_get.... \n");
             if ((dataReceived = table_get(table, msg->key)) != NULL)
             {
                 msg->value.data = dataReceived->data;
@@ -117,7 +115,6 @@ int invoke(MessageT *msg, struct table_t *table)
     }
     else if (operacao == MESSAGE_T__OPCODE__OP_PUT)
     {
-        printf("Efetuar operção put..... \n");
 
         // Operação de inserção ou atualização de um valor na tabela
         msg->opcode += 1;
@@ -134,9 +131,7 @@ int invoke(MessageT *msg, struct table_t *table)
         }
         if (snet.next_table != NULL)
         {
-            printf("Efetuar opre entry create.... \n");
 
-            printf("Efetuar pre rtable_put %s\n", snet.next_table->server_address);
             if ((rtable_put(snet.next_table, entry)) == -1)
             {
                 printf("Erro ao enviar ao proximo servidor");
