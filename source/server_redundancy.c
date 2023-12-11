@@ -53,7 +53,6 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             }
 
             sortNodeIds(children_list);
-            printf("nodeId pré chamada: %s\n", zkServerNodeID);
             snet.proximo_node = getNextNode(children_list, zkServerNodeID);
             if (snet.proximo_node == NULL)
             {
@@ -152,7 +151,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
  */
 int server_zoo_init(const char *zoo_host)
 {
-    printf("Entrei no server_zoo_init \n");
+    printf("Iniciando conexão com o ZooKeeper...\n");
     if (is_connected)
     {
         printf("Ja está conectado ao zookeper. \n");
@@ -193,6 +192,7 @@ int server_zoo_init(const char *zoo_host)
  */
 enum server_status server_zoo_register(const char *data, size_t datasize)
 {
+    printf("A registar servidor no ZooKeeper...\n");
     if (!is_connected)
     {
         printf("Não está conectado ao zookeeper, não foi possivel inicar o node.\n");
@@ -240,6 +240,7 @@ enum server_status server_zoo_register(const char *data, size_t datasize)
 
 int server_zoo_setwatch(enum server_status *status)
 {
+    printf("A configurar watch no nó '/chain'...\n");
     if (!is_connected)
         return -1;
 
@@ -256,6 +257,7 @@ int server_zoo_setwatch(enum server_status *status)
 
 int connect_zoo_server(struct rtable_t *server, char *serverInfo)
 {
+    printf("A conectar ao próximo servidor...\n");
     server = malloc(sizeof(struct rtable_t));
     printf("SERVER INFO: %s\n\n", serverInfo);
     // char *host = strtok((char *)serverInfo, ":"); // hostname    removed:

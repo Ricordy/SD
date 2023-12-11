@@ -107,9 +107,9 @@ void sortNodeIds(zoo_string *idList)
 
 char *getNextNode(zoo_string *idList, char *nodeId)
 {
-    printf("Arguments:\n");
-    printf("idList->count: %d\n", idList->count);
-    printf("nodeId: %s\n", nodeId);
+    //printf("Arguments:\n");
+    //printf("idList->count: %d\n", idList->count);
+    //printf("nodeId: %s\n", nodeId);
 
     for (int i = 0; i < idList->count; i++)
     {
