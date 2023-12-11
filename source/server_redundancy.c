@@ -105,7 +105,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 {
                     printf("9.4.1\n");
                     printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
-                    snet.next_table = rtable_connect(snet.proximo_server_add);
+                    snet.next_table = connect_zoo_server(snet.proximo_server_add);
                 }
                 else
                 {
@@ -264,16 +264,26 @@ int server_zoo_setwatch(enum server_status *status)
 
 int connect_zoo_server(struct rtable_t *server, char *serverInfo)
 {
-
-    server = malloc(sizeof(struct rtable_t));
     printf("SERVER INFO: %s\n\n", serverInfo);
     char *host = strtok((char *)serverInfo, ":"); // hostname    removed:
     int port = atoi(strtok(NULL, ":"));           // port      '<' ':' '>'
-    printf("9.4.1.1 port: %s\n", port);
-    server->socket.sin_family = AF_INET;
-    server->socket.sin_port = htons(port);
+    printf("9.4.1.1 port: %s\n", atoi(strtok(NULL, ":")));
+    for (int i = 0; i < strlen(serverInfo); i++) // Percorrer o array de char fornecido
+    {
+        if (serverInfo[i] == ':') // quando encontramos a divisão ip:porto
+        {
+
+            server->server_port = atoi(serverInfo + i + 1);                     // Converter a string relativa ao porto
+            server->server_address = malloc(sizeof(char) * (i + 1));            // Reservar o espaço necessário para o ip do servidor
+            memcpy(server->server_address, serverInfo, sizeof(char) * (i + 1)); // copiar o valor do ip para a o endereço da memoria que definimos anteriormente
+            ((char *)server->server_address)[i] = '\0';
+            server->socket.sin_family = AF_INET;
+            server->socket.sin_port = htons(server->server_port); // Colocar o caracter de fim de string
+        }
+    }
+
     printf("9.4.1.2\n");
-    if (inet_pton(AF_INET, host, &server->socket.sin_addr) < 1)
+    if (inet_pton(AF_INET, server->server_address, &server->socket.sin_addr) < 1)
     {
         printf("Erro ao converter IP\n");
         return -1;
