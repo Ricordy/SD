@@ -263,6 +263,44 @@ int server_zoo_setwatch(enum server_status *status)
     return 0;
 }
 
+int connect_zoo_server(struct rtree_t *server, char *serverInfo)
+{
+    // printf("SERVER INFO: %s\n\n", serverInfo);
+    // VERIFICAR SE FUNCIONA
+    char *host = strtok((char *)serverInfo, ":"); // hostname    removed:
+    int port = atoi(strtok(NULL, ":"));           // port      '<' ':' '>'
+
+    server->server_socket.sin_family = AF_INET;
+    server->server_socket.sin_port = htons(port);
+
+    if (inet_pton(AF_INET, host, &server->server_socket.sin_addr) < 1)
+    {
+        printf("Erro ao converter IP\n");
+        return -1;
+    }
+    // Criar socket TCP
+    if ((server->socket_num = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        perror("Erro ao criar socket TCP - Cliente");
+        exit(1);
+    }
+    // printf("SOCKET NUMBER: %d\n\n\n", server->socket_num);
+
+    // Estabelece conexao com o servidor
+    if (connect(server->socket_num, (struct sockaddr *)&server->server_socket, sizeof(server->server_socket)) < 0)
+    {
+        perror("Erro ao conetar ao servidor - Client");
+        close(server->socket_num);
+        exit(1);
+    }
+
+    // signal(SIGPIPE, conn_lost);
+
+    printf("Conetado ao próximo servidor\n");
+
+    return 0;
+}
+
 int server_zoo_get_primary(char *meta_data, int size)
 {
     if (!is_connected)
