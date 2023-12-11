@@ -73,6 +73,7 @@ int network_server_init(short port)
 
 void *handle_client(void *arg)
 {
+    printf("5.4.3.1 Handling client.\n");
     if (pthread_detach(pthread_self()) != 0)
     {
         perror("Erro ao fazer detach da thread");
@@ -90,6 +91,7 @@ void *handle_client(void *arg)
 
     while (1)
     {
+        printf("5.4.3.2\n");
         // Receber a mensagem do cliente
         msg = network_receive(connsockfd);
         if (msg == NULL)
@@ -98,7 +100,7 @@ void *handle_client(void *arg)
             return (void *)-1;
             // break;
         }
-
+        printf("5.4.3.3\n");
         // Executa a operação enviada pelo cliente
         pthread_mutex_lock(&table_mutex);
         // Iniciar contagem de tempo da operação recorrendo a função gettimeofday

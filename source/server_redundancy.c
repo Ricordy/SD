@@ -105,7 +105,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 {
                     printf("9.4.1\n");
                     printf("A conectar ao proximo node no servidor %s... \n", snet.proximo_server_add);
-                    snet.next_table = connect_zoo_server(snet.proximo_server_add);
+                    snet.next_table = connect_zoo_server(remote_server_table, snet.proximo_server_add);
                 }
                 else
                 {
@@ -264,21 +264,26 @@ int server_zoo_setwatch(enum server_status *status)
 
 int connect_zoo_server(struct rtable_t *server, char *serverInfo)
 {
+    server = malloc(sizeof(struct rtable_t));
     printf("SERVER INFO: %s\n\n", serverInfo);
-    char *host = strtok((char *)serverInfo, ":"); // hostname    removed:
-    int port = atoi(strtok(NULL, ":"));           // port      '<' ':' '>'
-    printf("9.4.1.1 port: %s\n", atoi(strtok(NULL, ":")));
+    // char *host = strtok((char *)serverInfo, ":"); // hostname    removed:
+    // int port = atoi(strtok(NULL, ":"));           // port      '<' ':' '>'
+    printf("9.4.1.1 \n");
     for (int i = 0; i < strlen(serverInfo); i++) // Percorrer o array de char fornecido
     {
         if (serverInfo[i] == ':') // quando encontramos a divisão ip:porto
         {
-
-            server->server_port = atoi(serverInfo + i + 1);                     // Converter a string relativa ao porto
-            server->server_address = malloc(sizeof(char) * (i + 1));            // Reservar o espaço necessário para o ip do servidor
+            printf("9.4.1.1.1 \n");
+            server->server_port = atoi(serverInfo + i + 1);
+            printf("9.4.1.1.1 port done \n");                        // Converter a string relativa ao porto
+            server->server_address = malloc(sizeof(char) * (i + 1)); // Reservar o espaço necessário para o ip do servidor
+            printf("9.4.1.1.2 \n");
             memcpy(server->server_address, serverInfo, sizeof(char) * (i + 1)); // copiar o valor do ip para a o endereço da memoria que definimos anteriormente
             ((char *)server->server_address)[i] = '\0';
+            printf("9.4.1.1.3 \n");
             server->socket.sin_family = AF_INET;
             server->socket.sin_port = htons(server->server_port); // Colocar o caracter de fim de string
+            printf("9.4.1.1.4 \n");
         }
     }
 
@@ -292,7 +297,7 @@ int connect_zoo_server(struct rtable_t *server, char *serverInfo)
     if ((server->sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         perror("Erro ao criar socket TCP - Cliente");
-        exit(1);
+        return -1;
     }
     // printf("SOCKET NUMBER: %d\n\n\n", server->socket_num);
 
@@ -301,7 +306,7 @@ int connect_zoo_server(struct rtable_t *server, char *serverInfo)
     {
         perror("Erro ao conetar ao servidor - Client");
         close(server->sockfd);
-        exit(1);
+        return -1;
     }
 
     // signal(SIGPIPE, conn_lost);
